@@ -18,6 +18,7 @@ namespace WindowsShutdownTimer
 
         /// TODO: Add a check to make sure the number is reasonable.
         /// TODO: Show the estimated shut off time based on the number entered in the textbox.
+        /// TODO: Add the ability to maintain the current timer (maybe a countdown or something untile executed).
         private void addTimer_Button(object sender, EventArgs e)
         {
             string cmd;
@@ -28,8 +29,9 @@ namespace WindowsShutdownTimer
 
                 if(confirm == DialogResult.Yes)
                 {
-                    cmd = "/C mkdir " + numMinutes;
+                    int timeInSeconds = numMinutes * 60;
 
+                    cmd = "/C timeout " + timeInSeconds + " && shutdown -s";
                     System.Diagnostics.Process.Start("CMD.exe", cmd);
 
                     Application.Exit();
