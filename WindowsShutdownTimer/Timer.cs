@@ -19,6 +19,8 @@ namespace WindowsShutdownTimer
         /// TODO: Add a check to make sure the number is reasonable.
         /// TODO: Show the estimated shut off time based on the number entered in the textbox.
         /// TODO: Add the ability to maintain the current timer (maybe a countdown or something untile executed).
+        /// TODO: Force the cmd prompt to be silent.
+        /// TODO: Force the blue banner to not display on windows 10.
         private void addTimer_Button(object sender, EventArgs e)
         {
             string cmd;
