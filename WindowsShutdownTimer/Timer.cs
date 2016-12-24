@@ -16,15 +16,24 @@ namespace WindowsShutdownTimer
             description_label.Text = "Please enter the number minutes from now that you would like to shut down Windows.";
         }
 
+        /// TODO: Add a check to make sure the number is reasonable.
+        /// TODO: Show the estimated shut off time based on the number entered in the textbox.
         private void addTimer_Button(object sender, EventArgs e)
         {
             string cmd;
 
             if(int.TryParse(MinutesTextBox.Text, out int numMinutes))
             {
-                cmd = "/C mkdir " + numMinutes;
+                DialogResult confirm = MessageBox.Show("Are you sure you want to shutdown Windows in " + numMinutes + " minutes?", "Confirm Timer", MessageBoxButtons.YesNo);
 
-                System.Diagnostics.Process.Start("CMD.exe", cmd);
+                if(confirm == DialogResult.Yes)
+                {
+                    cmd = "/C mkdir " + numMinutes;
+
+                    System.Diagnostics.Process.Start("CMD.exe", cmd);
+
+                    Application.Exit();
+                }
             }
 
             else
