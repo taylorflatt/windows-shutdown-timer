@@ -3,6 +3,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
+/// TODO: Save the last run date, the last timer run, and then compare that information after running a test shutdown timer to 
+/// see if the user has a current running timer. Alternatively, I can move to a DateTime rather than TimeSpan since the DateTime
+/// would store the additional date information which would eliminate one of the settings needed to be saved. Need to sleep.
+/// 
+/// This is mainly to allow you to cancel a previous timer in the event the program is closed. 
+/// 
+/// TODO: Need a cleaner option to handle all the switching for button toggling. Not sure if there really is a nicer option.
+/// 
+
 namespace WindowsShutdownTimer
 {
     public partial class TimerForm : Form
@@ -29,6 +38,7 @@ namespace WindowsShutdownTimer
             description_label.Text = "Enter the number minutes from now that you would like to shut down Windows (e.g. 5 for 5 minutes from now).";
 
             _currentTime = new TimeSpan();
+            //Properties.Settings.Default.ShutdownTimer;
             _shutdownTime = new TimeSpan();
 
             time_remaining_timer.Enabled = false;
@@ -36,8 +46,44 @@ namespace WindowsShutdownTimer
             time_remaining_desc_label.Text = "Time Remaining: ";
             time_remaining_label.Text = _shutdownTime.ToString();
 
-            stopTimerToolStripMenuItem.Enabled = false;
+            DisableStopTimerButtons();
+            DisableModifyTimerButtons();
+        }
+
+        private void EnableModifyTimerButtons()
+        {
+            addTimerToolStripMenuItem.Enabled = true;
+            add10MinutesToolStripMenuItem.Enabled = true;
+        }
+
+        private void DisableModifyTimerButtons()
+        {
             addTimerToolStripMenuItem.Enabled = false;
+            add10MinutesToolStripMenuItem.Enabled = false;
+        }
+
+        private void EnableStopTimerButtons()
+        {
+            stopTimerToolStripMenuItem.Enabled = true;
+            stopTimerContextToolStripMenuItem.Enabled = true;
+        }
+
+        private void DisableStopTimerButtons()
+        {
+            stopTimerToolStripMenuItem.Enabled = false;
+            stopTimerContextToolStripMenuItem.Enabled = false;
+        }
+
+        /// <summary>
+        /// Applies the user's settings.
+        /// </summary>
+        public void ApplyUserSettings()
+        {
+            if (Properties.Settings.Default.MinimizePref)
+                notifyIcon.Visible = true;
+
+            else
+                notifyIcon.Visible = false;
         }
 
         /// <summary>
@@ -76,8 +122,8 @@ namespace WindowsShutdownTimer
         {
             // Enable timer, stop timer button, and add time button.
             time_remaining_timer.Enabled = true;
-            stopTimerToolStripMenuItem.Enabled = true;
-            addTimerToolStripMenuItem.Enabled = true;
+            EnableStopTimerButtons();
+            EnableModifyTimerButtons();
 
             SetCurrentTime();
             SetShutdownTime(numMinutes);
@@ -113,7 +159,10 @@ namespace WindowsShutdownTimer
             else if (process.ExitCode != 0)
                 throw new StartTimerException("Could not execute the start shutdown command through the command prompt. ");
             else
+            {
+                createTimerToolStripMenuItem.Enabled = false;
                 time_remaining_timer_Tick(null, null);
+            }
         }
 
         /// <summary>
@@ -133,6 +182,8 @@ namespace WindowsShutdownTimer
             {
                 if(reset)
                 {
+                    createTimerToolStripMenuItem.Enabled = true;
+
                     // Reset values.
                     _currentTime = TimeSpan.Zero;
                     _shutdownTime = TimeSpan.Zero;
@@ -142,10 +193,10 @@ namespace WindowsShutdownTimer
 
                     // Disable the timer.
                     time_remaining_timer.Enabled = false;
-                    addTimerToolStripMenuItem.Enabled = false;
+                    DisableModifyTimerButtons();
 
                     // Disable the stop timer button again.
-                    stopTimerToolStripMenuItem.Enabled = false;
+                    DisableStopTimerButtons();
                 }
             }
         }
@@ -307,6 +358,68 @@ namespace WindowsShutdownTimer
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            MessageBox.Show("Test!");
+        }
+
+        /// <summary>
+        /// Occurs when the user attempts to manipulate the window in any way (such as minimizing).
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimerForm_Resize(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                ApplyUserSettings();
+
+                if (Properties.Settings.Default.MinimizePref)
+                    this.ShowInTaskbar = false;
+                else
+                    this.ShowInTaskbar = true;
+            }
+        }
+
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options optionsForm = new Options(this);
+
+            optionsForm.Visible = true;
+            optionsForm.Height = this.Height;
+            optionsForm.Width = this.Width;
+            optionsForm.Text = this.Text + " Options";
+            optionsForm.Name = this.Name + " Options";
+        }
+
+        private void notifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Normal;
+        }
+
+        private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Normal;
+        }
+
+        private void stopTimerToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (_shutdownTime == TimeSpan.Zero)
+                StopShutdownTimer(false);
+            else
+                StopShutdownTimer(true);
+        }
+
+        private void add_10_min_menu_item_Click(object sender, EventArgs e)
+        {
+            _shutdownTime = _shutdownTime.Add(new TimeSpan(0, 10, 0));
+        }
+
+        private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Normal;
         }
     }
 }
