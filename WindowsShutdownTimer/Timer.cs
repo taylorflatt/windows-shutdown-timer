@@ -7,6 +7,9 @@ namespace WindowsShutdownTimer
 {
     public partial class TimerForm : Form
     {
+        /// <summary>
+        /// Tracks the current time and the projected shutdown time. Used for calculating remaining time to display to the user.
+        /// </summary>
         public TimeSpan _currentTime;
         public TimeSpan _shutdownTime;
 
@@ -17,10 +20,13 @@ namespace WindowsShutdownTimer
         {
             InitializeComponent();
 
+            this.Name = "Shutdown Windows Timer";
+            this.Text = "Shutdown Windows Timer";
+
             submit_Button.Enabled = false;
             description_label.AutoSize = true;
             description_label.MaximumSize = new System.Drawing.Size(325, 0);
-            description_label.Text = "Please enter the number minutes from now that you would like to shut down Windows (e.g. 5 for 5 minutes from now).";
+            description_label.Text = "Enter the number minutes from now that you would like to shut down Windows (e.g. 5 for 5 minutes from now).";
 
             _currentTime = new TimeSpan();
             _shutdownTime = new TimeSpan();
@@ -250,8 +256,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Created by Taylor Flatt. This program is distributed on an 'as-is' basis and I accept no responsibility for any potential "
-                + "losses/damages.", "About", MessageBoxButtons.OK);
+            MessageBox.Show("Created and maintained by Taylor Flatt. More information can be found at https://github.com/taylorflatt/windows-shutdown-timer.", "About", MessageBoxButtons.OK);
         }
 
         /// <summary>

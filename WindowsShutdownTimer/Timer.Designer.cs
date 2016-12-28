@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TimerForm));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.description_label = new System.Windows.Forms.Label();
             this.MinutesTextBox = new System.Windows.Forms.TextBox();
@@ -145,7 +146,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -172,28 +173,28 @@
             // add_5_min_menu_item
             // 
             this.add_5_min_menu_item.Name = "add_5_min_menu_item";
-            this.add_5_min_menu_item.Size = new System.Drawing.Size(132, 22);
+            this.add_5_min_menu_item.Size = new System.Drawing.Size(152, 22);
             this.add_5_min_menu_item.Text = "5 Minutes";
             this.add_5_min_menu_item.Click += new System.EventHandler(this.add_5_min_menu_item_Click);
             // 
             // add_30_min_menu_item
             // 
             this.add_30_min_menu_item.Name = "add_30_min_menu_item";
-            this.add_30_min_menu_item.Size = new System.Drawing.Size(132, 22);
+            this.add_30_min_menu_item.Size = new System.Drawing.Size(152, 22);
             this.add_30_min_menu_item.Text = "30 Minutes";
             this.add_30_min_menu_item.Click += new System.EventHandler(this.add_30_min_menu_item_Click);
             // 
             // add_1_hr_menu_item
             // 
             this.add_1_hr_menu_item.Name = "add_1_hr_menu_item";
-            this.add_1_hr_menu_item.Size = new System.Drawing.Size(132, 22);
+            this.add_1_hr_menu_item.Size = new System.Drawing.Size(152, 22);
             this.add_1_hr_menu_item.Text = "1 Hour";
             this.add_1_hr_menu_item.Click += new System.EventHandler(this.add_1_hr_menu_item_Click);
             // 
             // add_2_hr_menu_item
             // 
             this.add_2_hr_menu_item.Name = "add_2_hr_menu_item";
-            this.add_2_hr_menu_item.Size = new System.Drawing.Size(132, 22);
+            this.add_2_hr_menu_item.Size = new System.Drawing.Size(152, 22);
             this.add_2_hr_menu_item.Text = "2 Hours";
             this.add_2_hr_menu_item.Click += new System.EventHandler(this.add_2_hr_menu_item_Click);
             // 
@@ -222,6 +223,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.main_menu);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.main_menu;
             this.MaximizeBox = false;
             this.Name = "TimerForm";
