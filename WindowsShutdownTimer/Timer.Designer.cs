@@ -28,12 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.description_label = new System.Windows.Forms.Label();
             this.MinutesTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.submit_Button = new System.Windows.Forms.Button();
+            this.time_remaining_desc_label = new System.Windows.Forms.Label();
+            this.time_remaining_label = new System.Windows.Forms.Label();
+            this.time_remaining_timer = new System.Windows.Forms.Timer(this.components);
+            this.main_menu = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stopTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
+            this.main_menu.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -41,9 +50,9 @@
             this.groupBox1.Controls.Add(this.description_label);
             this.groupBox1.Controls.Add(this.MinutesTextBox);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
+            this.groupBox1.Location = new System.Drawing.Point(12, 27);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(260, 95);
+            this.groupBox1.Size = new System.Drawing.Size(331, 97);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Set Timer";
@@ -59,7 +68,7 @@
             // 
             // MinutesTextBox
             // 
-            this.MinutesTextBox.Location = new System.Drawing.Point(60, 64);
+            this.MinutesTextBox.Location = new System.Drawing.Point(58, 61);
             this.MinutesTextBox.Name = "MinutesTextBox";
             this.MinutesTextBox.Size = new System.Drawing.Size(145, 20);
             this.MinutesTextBox.TabIndex = 1;
@@ -68,7 +77,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 67);
+            this.label1.Location = new System.Drawing.Point(8, 64);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(47, 13);
             this.label1.TabIndex = 0;
@@ -76,7 +85,7 @@
             // 
             // submit_Button
             // 
-            this.submit_Button.Location = new System.Drawing.Point(197, 113);
+            this.submit_Button.Location = new System.Drawing.Point(268, 130);
             this.submit_Button.Name = "submit_Button";
             this.submit_Button.Size = new System.Drawing.Size(75, 23);
             this.submit_Button.TabIndex = 1;
@@ -84,20 +93,82 @@
             this.submit_Button.UseVisualStyleBackColor = true;
             this.submit_Button.Click += new System.EventHandler(this.addTimer_Button);
             // 
+            // time_remaining_desc_label
+            // 
+            this.time_remaining_desc_label.AutoSize = true;
+            this.time_remaining_desc_label.Location = new System.Drawing.Point(19, 132);
+            this.time_remaining_desc_label.Name = "time_remaining_desc_label";
+            this.time_remaining_desc_label.Size = new System.Drawing.Size(86, 13);
+            this.time_remaining_desc_label.TabIndex = 2;
+            this.time_remaining_desc_label.Text = "Time Remaining:";
+            // 
+            // time_remaining_label
+            // 
+            this.time_remaining_label.AutoSize = true;
+            this.time_remaining_label.Location = new System.Drawing.Point(104, 132);
+            this.time_remaining_label.Name = "time_remaining_label";
+            this.time_remaining_label.Size = new System.Drawing.Size(35, 13);
+            this.time_remaining_label.TabIndex = 3;
+            this.time_remaining_label.Text = "label3";
+            // 
+            // time_remaining_timer
+            // 
+            this.time_remaining_timer.Tick += new System.EventHandler(this.time_remaining_timer_Tick);
+            // 
+            // main_menu
+            // 
+            this.main_menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem});
+            this.main_menu.Location = new System.Drawing.Point(0, 0);
+            this.main_menu.Name = "main_menu";
+            this.main_menu.Size = new System.Drawing.Size(355, 24);
+            this.main_menu.TabIndex = 4;
+            this.main_menu.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.stopTimerToolStripMenuItem,
+            this.aboutToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // stopTimerToolStripMenuItem
+            // 
+            this.stopTimerToolStripMenuItem.Name = "stopTimerToolStripMenuItem";
+            this.stopTimerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stopTimerToolStripMenuItem.Text = "Stop Timer";
+            this.stopTimerToolStripMenuItem.Click += new System.EventHandler(this.stopTimerToolStripMenuItem_Click);
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Text = "Exit";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
             // TimerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 144);
+            this.ClientSize = new System.Drawing.Size(355, 162);
+            this.Controls.Add(this.time_remaining_label);
+            this.Controls.Add(this.time_remaining_desc_label);
             this.Controls.Add(this.submit_Button);
             this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.main_menu);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MainMenuStrip = this.main_menu;
             this.MaximizeBox = false;
             this.Name = "TimerForm";
             this.Text = "Shutdown Windows";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.main_menu.ResumeLayout(false);
+            this.main_menu.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -108,6 +179,13 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button submit_Button;
         private System.Windows.Forms.Label description_label;
+        private System.Windows.Forms.Label time_remaining_desc_label;
+        private System.Windows.Forms.Label time_remaining_label;
+        private System.Windows.Forms.Timer time_remaining_timer;
+        private System.Windows.Forms.MenuStrip main_menu;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stopTimerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
     }
 }
 
