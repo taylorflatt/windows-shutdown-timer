@@ -23,7 +23,7 @@ Currently only tested working on Windows 10. It should work just fine for Window
 
 ## Usage
 
-Download WindowsShutdownTimer.exe anywhere to your computer and simply run it. No installation is required. The only file stored is noted below and I will be adding an option to turn off the ability to save settings if you so choose.
+Download [WindowsShutdownTimer.exe](https://github.com/taylorflatt/windows-shutdown-timer/raw/master/WindowsShutdownTimer.exe) located in the repository anywhere to your computer and simply run it. No installation is required. The only file stored is noted below and I will be adding an option to turn off the ability to save settings if you so choose.
 
 ## Notes
 
