@@ -3,7 +3,7 @@ A basic Windows shutdown timer. I use this personally but it is available for an
 
 ## Function
 
-Creates timer that will shutdown windows after a specified number of minutes. It is non-intrusive meaning once you set the timer, you can hide it or close it without any problems.
+Creates timer that will shutdown windows after a specified number of minutes. It is non-intrusive meaning once you set the timer, you can hide it or close it without any problems. At its core, it runs a shutdown command through the windows command prompt with a timer attached.
 
 ## Features
 
@@ -18,3 +18,7 @@ Creates timer that will shutdown windows after a specified number of minutes. It
 * [.NET Framework 4.5.2](https://www.microsoft.com/en-us/download/details.aspx?id=42642) or better
 
 Currently only tested working on Windows 10. It should work just fine for Windows 8 and Windows 7 but I have yet to test it on those.
+
+## Notes
+
+Any user settings are stored in `%USERPROFILE%/AppData/Local/WindowsShutdownTimer`. 
