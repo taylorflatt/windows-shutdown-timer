@@ -18,15 +18,16 @@ namespace WindowsShutdownTimer
             description_label.MaximumSize = new System.Drawing.Size(325, 0);
             description_label.Text = "Please enter the number minutes from now that you would like to shut down Windows.";
 
-            time_remaining_timer.Enabled = false;
-            time_remaining_timer.Interval = 5000;   // Check time remaining every 5 seconds.
-            time_remaining_desc_label.Text = "Time Remaining: ";
-            time_remaining_label.Text = "N/A";
-
             _currentTime = new TimeSpan();
             _shutdownTime = new TimeSpan();
 
+            time_remaining_timer.Enabled = false;
+            time_remaining_timer.Interval = 5000;   // Check time remaining every 5 seconds.
+            time_remaining_desc_label.Text = "Time Remaining: ";
+            time_remaining_label.Text = _shutdownTime.ToString();
+
             stopTimerToolStripMenuItem.Enabled = false;
+            addTimerToolStripMenuItem.Enabled = false;
         }
 
         private void SetCurrentTime()
@@ -52,8 +53,6 @@ namespace WindowsShutdownTimer
         /// TODO: Force the blue banner to not display on windows 10.
         private void addTimer_Button(object sender, EventArgs e)
         {
-            string cmd;
-
             if(int.TryParse(MinutesTextBox.Text, out int numMinutes))
             {
                 DialogResult confirm = MessageBox.Show("Are you sure you want to shutdown Windows in " + numMinutes + " minutes?", "Confirm Timer", MessageBoxButtons.YesNo);
@@ -65,6 +64,7 @@ namespace WindowsShutdownTimer
 
                     // Enable the stop timer button.
                     stopTimerToolStripMenuItem.Enabled = true;
+                    addTimerToolStripMenuItem.Enabled = true;
 
                     // Initially set the current time.
                     SetCurrentTime();
@@ -75,13 +75,14 @@ namespace WindowsShutdownTimer
                     //int timeInSeconds = numMinutes * 60;
                     //cmd = "/C timeout " + timeInSeconds + " && shutdown -s";
 
-                    cmd = "/C mkdir " + numMinutes;
+                    string cmd = "/C mkdir " + numMinutes;
                     System.Diagnostics.Process.Start("CMD.exe", cmd);
 
                     time_remaining_timer_Tick(null, null);
                 }
             }
 
+            // Definitely don't need to throw an except here.
             else
                 throw new Exception("Must enter a valid time in the minutes textbox!");
         }
@@ -94,6 +95,7 @@ namespace WindowsShutdownTimer
                 submit_Button.Enabled = false;
         }
 
+        // Maybe I don't need to actually throw an exception here.
         private void time_remaining_timer_Tick(object sender, EventArgs e)
         {
             try
@@ -106,30 +108,29 @@ namespace WindowsShutdownTimer
             }
         }
 
-        private void stopTimerToolStripMenuItem_Click(object sender, EventArgs e)
+        private void stopTimerToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            string cmd;
-
             DialogResult confirm = MessageBox.Show("Are you sure you want to stop the current shutdown?", "Confirm Timer", MessageBoxButtons.YesNo);
 
             if (confirm == DialogResult.Yes)
             {
-                cmd = "/C mkdir stop";
+                string cmd = "/C mkdir stop";
                 var process = System.Diagnostics.Process.Start("CMD.exe", cmd);
                 process.WaitForExit();
 
                 if (process.ExitCode != 0)
                 {
                     MessageBox.Show("Could not stop the shutdown timer for some reason. Adding an additional 5 minutes to the timer. Please run 'shutdown /a' in " +
-                        "the command prompt to stop the timer.", "ERROR!", MessageBoxButtons.OK);
+                        "the command prompt to stop the timer.", "ERROR", MessageBoxButtons.OK);
 
                     // Add an additional 5 minutes to the timer.
-                    SetShutdownTime(5);
+                    _shutdownTime = _shutdownTime.Add(new TimeSpan(0, 5, 0));
                 }
                 else
                 {
                     // Disable the timer.
                     time_remaining_timer.Enabled = false;
+                    addTimerToolStripMenuItem.Enabled = false;
 
                     // Disable the stop timer button again.
                     stopTimerToolStripMenuItem.Enabled = false;
@@ -141,9 +142,34 @@ namespace WindowsShutdownTimer
             }
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void add_2_hr_menu_item_Click(object sender, EventArgs e)
+        {
+            _shutdownTime = _shutdownTime.Add(new TimeSpan(2, 0, 0));
+        }
+
+        private void add_1_hr_menu_item_Click(object sender, EventArgs e)
+        {
+            _shutdownTime = _shutdownTime.Add(new TimeSpan(1, 0, 0));
+        }
+
+        private void add_30_min_menu_item_Click(object sender, EventArgs e)
+        {
+            _shutdownTime = _shutdownTime.Add(new TimeSpan(0, 30, 0));
+        }
+
+        private void add_5_min_menu_item_Click(object sender, EventArgs e)
+        {
+            _shutdownTime = _shutdownTime.Add(new TimeSpan(0, 5, 0));
+        }
+
+        private void stopTimerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
