@@ -1,7 +1,7 @@
 # Windows Shutdown Timer
 A basic Windows shutdown timer. I use this personally but it is available for anyone to use. 
 
-Note: This is still a WIP so the release will change fairly rapidly for the next few days (12/28/16). Until I add an update option, check back here for the most updated version.
+**Note**: This is still a WIP so the release will change fairly rapidly for the next few days (12/28/16). Until I add an update option, check back here for the most updated version.
 
 ## Function
 
