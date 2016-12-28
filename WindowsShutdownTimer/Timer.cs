@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -57,11 +58,18 @@ namespace WindowsShutdownTimer
             SetCurrentTime();
             SetShutdownTime(numMinutes);
 
-            //int timeInSeconds = numMinutes * 60;
-            //cmd = "/C timeout " + timeInSeconds + " && shutdown -s";
+            int timeInSeconds = numMinutes * 60;
+            //string cmd = "/C timeout " + timeInSeconds + " && shutdown -s";
+            string cmd = "/C shutdown -s -t " + timeInSeconds;
 
-            string cmd = "/C mkdir " + numMinutes;
-            var process = System.Diagnostics.Process.Start("CMD.exe", cmd);
+            //string cmd = "/C mkdir " + numMinutes;
+            var process = new Process();
+
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = cmd;
+            process.Start();
             process.WaitForExit();
 
             if (process.ExitCode != 0)
@@ -72,8 +80,8 @@ namespace WindowsShutdownTimer
 
         private void StopShutdownTimer()
         {
-            string cmd = "/C mkdir stop";
-            var process = System.Diagnostics.Process.Start("CMD.exe", cmd);
+            string cmd = "/C shutdown /a";
+            var process = Process.Start("CMD.exe", cmd);
             process.WaitForExit();
 
             if (process.ExitCode != 0)
@@ -81,16 +89,19 @@ namespace WindowsShutdownTimer
 
             else
             {
+                // Reset values.
+                _currentTime = new TimeSpan(0, 0, 0);
+                _shutdownTime = new TimeSpan(0, 0, 0);
+
+                // Reset the remaining time label.
+                time_remaining_timer_Tick(null, null);
+
                 // Disable the timer.
                 time_remaining_timer.Enabled = false;
                 addTimerToolStripMenuItem.Enabled = false;
 
                 // Disable the stop timer button again.
                 stopTimerToolStripMenuItem.Enabled = false;
-
-                // Reset values.
-                _currentTime = new TimeSpan(0, 0, 0);
-                _shutdownTime = new TimeSpan(0, 0, 0);
             }
         }
 
