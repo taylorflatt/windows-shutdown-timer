@@ -1,6 +1,8 @@
 # Windows Shutdown Timer
 A basic Windows shutdown timer. I use this personally but it is available for anyone to use. 
 
+Note: This is still a WIP so the release will change fairly rapidly for the next few days (12/28/16). Until I add an update option, check back here for the most updated version.
+
 ## Function
 
 Creates timer that will shutdown windows after a specified number of minutes. It is non-intrusive meaning once you set the timer, you can hide it or close it without any problems. At its core, it runs a shutdown command through the windows command prompt with a timer attached.
