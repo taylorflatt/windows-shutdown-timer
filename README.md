@@ -21,6 +21,10 @@ Creates timer that will shutdown windows after a specified number of minutes. It
 
 Currently only tested working on Windows 10. It should work just fine for Windows 8 and Windows 7 but I have yet to test it on those.
 
+## Usage
+
+Download WindowsShutdownTimer.exe anywhere to your computer and simply run it. No installation is required. The only file stored is noted below and I will be adding an option to turn off the ability to save settings if you so choose.
+
 ## Notes
 
 Any user settings are stored in `%USERPROFILE%/AppData/Local/WindowsShutdownTimer`. 
