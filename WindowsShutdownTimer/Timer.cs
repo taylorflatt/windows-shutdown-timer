@@ -567,10 +567,10 @@ namespace WindowsShutdownTimer
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <remarks>This depends completely on user settings and will not fire unless the user has selected the option in the options form.</remarks>
-        private void notifyIcon_Click(object sender, EventArgs e)
+        private void notifyIcon_Click(object sender, MouseEventArgs e)
         {
-            // Only re-show the app if the user has selected it.
-            if (Properties.Settings.Default.LClickOpenSysTray)
+            // Only re-show the app if the user has selected it and they are left clicking (not right clicking).
+            if (Properties.Settings.Default.LClickOpenSysTray && e.Button == MouseButtons.Left)
                 WindowState = FormWindowState.Normal;
         }
 

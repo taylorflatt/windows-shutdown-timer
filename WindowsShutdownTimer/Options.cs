@@ -110,6 +110,7 @@ namespace WindowsShutdownTimer
             Array webV = webVersion.Split('.');
             Array curV = currentVersion.Split('.');
 
+            // Note: The user's version number should never be higher than the release version. So I don't even consider that case.
             for(int i = 0; i < 4; i++)
             {
                 if(Convert.ToInt32(webV.GetValue(i)) > Convert.ToInt32(curV.GetValue(i)))

@@ -49,16 +49,17 @@
             this.add_1_hr_menu_item = new System.Windows.Forms.ToolStripMenuItem();
             this.add_2_hr_menu_item = new System.Windows.Forms.ToolStripMenuItem();
             this.stopTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shutdownNowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.add10MinutesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shutdownNowToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.stopTimerContextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shutdownNowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.optionsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.main_menu.SuspendLayout();
             this.contextMenuStrip.SuspendLayout();
@@ -187,7 +188,7 @@
             this.add_1_hr_menu_item,
             this.add_2_hr_menu_item});
             this.addTimerToolStripMenuItem.Name = "addTimerToolStripMenuItem";
-            this.addTimerToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.addTimerToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.addTimerToolStripMenuItem.Text = "Add Time";
             // 
             // add_5_min_menu_item
@@ -221,9 +222,39 @@
             // stopTimerToolStripMenuItem
             // 
             this.stopTimerToolStripMenuItem.Name = "stopTimerToolStripMenuItem";
-            this.stopTimerToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.stopTimerToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.stopTimerToolStripMenuItem.Text = "Stop Timer";
             this.stopTimerToolStripMenuItem.Click += new System.EventHandler(this.stopTimerToolStripMenuItem_Click);
+            // 
+            // shutdownNowToolStripMenuItem
+            // 
+            this.shutdownNowToolStripMenuItem.Name = "shutdownNowToolStripMenuItem";
+            this.shutdownNowToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.shutdownNowToolStripMenuItem.Text = "Shutdown Now";
+            this.shutdownNowToolStripMenuItem.Click += new System.EventHandler(this.shutdownNowToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.updateToolStripMenuItem,
+            this.optionsToolStripMenuItem1});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // updateToolStripMenuItem
+            // 
+            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
+            this.updateToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.updateToolStripMenuItem.Text = "Update";
+            this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
+            // 
+            // optionsToolStripMenuItem1
+            // 
+            this.optionsToolStripMenuItem1.Name = "optionsToolStripMenuItem1";
+            this.optionsToolStripMenuItem1.Size = new System.Drawing.Size(112, 22);
+            this.optionsToolStripMenuItem1.Text = "About";
+            this.optionsToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // notifyIcon
             // 
@@ -231,8 +262,8 @@
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
             this.notifyIcon.Text = "notifyIcon1";
             this.notifyIcon.Visible = true;
-            this.notifyIcon.Click += new System.EventHandler(this.notifyIcon_Click);
             this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
+            this.notifyIcon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_Click);
             // 
             // contextMenuStrip
             // 
@@ -240,9 +271,10 @@
             this.showTimerToolStripMenuItem,
             this.createTimerToolStripMenuItem,
             this.add10MinutesToolStripMenuItem,
+            this.shutdownNowToolStripMenuItem1,
             this.stopTimerContextToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(158, 92);
+            this.contextMenuStrip.Size = new System.Drawing.Size(158, 114);
             // 
             // showTimerToolStripMenuItem
             // 
@@ -265,42 +297,19 @@
             this.add10MinutesToolStripMenuItem.Text = "Add 10 Minutes";
             this.add10MinutesToolStripMenuItem.Click += new System.EventHandler(this.add_10_min_menu_item_Click);
             // 
+            // shutdownNowToolStripMenuItem1
+            // 
+            this.shutdownNowToolStripMenuItem1.Name = "shutdownNowToolStripMenuItem1";
+            this.shutdownNowToolStripMenuItem1.Size = new System.Drawing.Size(157, 22);
+            this.shutdownNowToolStripMenuItem1.Text = "Shutdown Now";
+            this.shutdownNowToolStripMenuItem1.Click += new System.EventHandler(this.shutdownNowToolStripMenuItem_Click);
+            // 
             // stopTimerContextToolStripMenuItem
             // 
             this.stopTimerContextToolStripMenuItem.Name = "stopTimerContextToolStripMenuItem";
             this.stopTimerContextToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
             this.stopTimerContextToolStripMenuItem.Text = "Stop Timer";
             this.stopTimerContextToolStripMenuItem.Click += new System.EventHandler(this.stopTimerToolStripMenuItem_Click);
-            // 
-            // shutdownNowToolStripMenuItem
-            // 
-            this.shutdownNowToolStripMenuItem.Name = "shutdownNowToolStripMenuItem";
-            this.shutdownNowToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.shutdownNowToolStripMenuItem.Text = "Shutdown Now";
-            this.shutdownNowToolStripMenuItem.Click += new System.EventHandler(this.shutdownNowToolStripMenuItem_Click);
-            // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.updateToolStripMenuItem,
-            this.optionsToolStripMenuItem1});
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.helpToolStripMenuItem.Text = "Help";
-            // 
-            // optionsToolStripMenuItem1
-            // 
-            this.optionsToolStripMenuItem1.Name = "optionsToolStripMenuItem1";
-            this.optionsToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
-            this.optionsToolStripMenuItem1.Text = "About";
-            this.optionsToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // updateToolStripMenuItem
-            // 
-            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
-            this.updateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.updateToolStripMenuItem.Text = "Update";
-            this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
             // 
             // TimerForm
             // 
@@ -360,6 +369,7 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem updateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem shutdownNowToolStripMenuItem1;
     }
 }
 
