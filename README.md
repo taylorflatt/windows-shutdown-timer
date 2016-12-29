@@ -9,10 +9,18 @@ Creates timer that will shutdown windows after a specified number of minutes. It
 
 ## Features
 
-* Shutdown windows after specified number of minutes.
+* Shutdown Windows after specified number of minutes.
 * Can minimize/close without impacting the shutdown timer.
 * Can add/subtract additional time to a shutdown timer.
-* Can stop an existing shutdown timer (created by this program or not). You will be prompted to confirm the cancellation. _Note: I am currently working on saving states after stopping the program so it loads back an existing timer and checks for current timers. It is a simple solution that I haven't gotten around to implementing._
+* Can stop an existing shutdown timer (created by this program or not). You will be prompted to confirm the cancellation.
+* Timers created by this program will persist even if the program is shutdown.
+* Ability to update from the program any time. It simply pulls the exe from GIT and places it in the directory from which the update was run. In other words, it puts the two versions in the same directory.
+
+## Known Issues
+
+There aren't any program breaking issues as of yet. If you discover any, please don't hesitate to contact me or raise an issue. But I am aware of some annoyances and am working on finding solutions to those:
+
+* When the program first starts, if a timer was set by the program previously but has yet to elapse, a check will be run. The check will cause a shutdown notification and a "ding". It doesn't change anything other than simply verify the existence of a timer. I'm looking for ways around this small annoyance. It doesn't happen often though, which is nice.
 
 ## Requirements
 
@@ -23,7 +31,7 @@ Currently only tested working on Windows 10. It should work just fine for Window
 
 ## Usage
 
-Download [WindowsShutdownTimer.exe](https://github.com/taylorflatt/windows-shutdown-timer/raw/master/WindowsShutdownTimer.exe) located in the repository anywhere to your computer and simply run it. No installation is required. The only file stored is noted below and I will be adding an option to turn off the ability to save settings if you so choose.
+Download [WindowsShutdownTimer.exe](https://github.com/taylorflatt/windows-shutdown-timer/raw/master/WindowsShutdownTimer.exe) located in the repository anywhere to your computer and simply run it. No installation is required. The only file stored is noted below.
 
 ## Notes
 
