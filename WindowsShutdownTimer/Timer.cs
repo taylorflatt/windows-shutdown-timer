@@ -3,12 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
-/// TODO: Save the last run date, the last timer run, and then compare that information after running a test shutdown timer to 
-/// see if the user has a current running timer. Alternatively, I can move to a DateTime rather than TimeSpan since the DateTime
-/// would store the additional date information which would eliminate one of the settings needed to be saved. Need to sleep.
-/// 
-/// This is mainly to allow you to cancel a previous timer in the event the program is closed. 
-/// 
 /// TODO: Need a cleaner option to handle all the switching for button toggling. Not sure if there really is a nicer option.
 /// 
 /// TODO: Add scheduler ability to shutdown computer everyday at a certain time. Basically add a scheduled event rather than 
@@ -73,7 +67,7 @@ namespace WindowsShutdownTimer
                 {
                     StopShutdownTimer(false);
                     StartShutdownTimer(timeRemaining.Minutes);
-
+                    createTimerToolStripMenuItem.Enabled = false;
                 }
             }
         }
@@ -322,6 +316,7 @@ namespace WindowsShutdownTimer
         {
             if(MinutesTextBox.Text.Any() && MinutesTextBox.Text.All(char.IsDigit))
                 submit_Button.Enabled = true;
+
             else
                 submit_Button.Enabled = false;
         }
@@ -387,7 +382,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_2_hr_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime.AddHours(2);
+            _shutdownTime = _shutdownTime.AddHours(2);
+            Properties.Settings.Default.Save();
         }
 
         /// <summary>
@@ -397,7 +393,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_1_hr_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime.AddHours(1);
+            _shutdownTime = _shutdownTime.AddHours(1);
+            Properties.Settings.Default.Save();
         }
 
         /// <summary>
@@ -407,7 +404,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_30_min_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime.AddMinutes(30);
+            _shutdownTime = _shutdownTime.AddMinutes(30);
+            Properties.Settings.Default.Save();
         }
 
         /// <summary>
@@ -417,7 +415,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_5_min_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime.AddMinutes(5);
+            _shutdownTime = _shutdownTime.AddMinutes(5);
+            Properties.Settings.Default.Save();
         }
 
         /// <summary>
@@ -428,11 +427,6 @@ namespace WindowsShutdownTimer
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
-        {
-            MessageBox.Show("Test!");
         }
 
         /// <summary>
@@ -484,12 +478,20 @@ namespace WindowsShutdownTimer
 
         private void add_10_min_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime.AddMinutes(10);
+            _shutdownTime = _shutdownTime.AddMinutes(10);
+            Properties.Settings.Default.Save();
         }
 
         private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Normal;
+        }
+
+        private void notifyIcon_Click(object sender, EventArgs e)
+        {
+            // Only re-show the app if the user has selected it.
+            if (Properties.Settings.Default.LClickOpenSysTray)
+                WindowState = FormWindowState.Normal;
         }
     }
 }

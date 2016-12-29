@@ -34,11 +34,13 @@
             this.save_options_button = new System.Windows.Forms.Button();
             this.last_shutdown_label_desc = new System.Windows.Forms.Label();
             this.last_shutdown_label = new System.Windows.Forms.Label();
+            this.left_click_open_sys_tray = new System.Windows.Forms.CheckBox();
             this.options_group_box.SuspendLayout();
             this.SuspendLayout();
             // 
             // options_group_box
             // 
+            this.options_group_box.Controls.Add(this.left_click_open_sys_tray);
             this.options_group_box.Controls.Add(this.last_shutdown_label);
             this.options_group_box.Controls.Add(this.last_shutdown_label_desc);
             this.options_group_box.Controls.Add(this.minimize_to_sys_tray);
@@ -87,6 +89,16 @@
             this.last_shutdown_label.TabIndex = 2;
             this.last_shutdown_label.Text = "label1";
             // 
+            // left_click_open_sys_tray
+            // 
+            this.left_click_open_sys_tray.AutoSize = true;
+            this.left_click_open_sys_tray.Location = new System.Drawing.Point(7, 44);
+            this.left_click_open_sys_tray.Name = "left_click_open_sys_tray";
+            this.left_click_open_sys_tray.Size = new System.Drawing.Size(186, 17);
+            this.left_click_open_sys_tray.TabIndex = 3;
+            this.left_click_open_sys_tray.Text = "Left click to open from system tray";
+            this.left_click_open_sys_tray.UseVisualStyleBackColor = true;
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -112,5 +124,6 @@
         private System.Windows.Forms.CheckBox minimize_to_sys_tray;
         private System.Windows.Forms.Label last_shutdown_label_desc;
         private System.Windows.Forms.Label last_shutdown_label;
+        private System.Windows.Forms.CheckBox left_click_open_sys_tray;
     }
 }

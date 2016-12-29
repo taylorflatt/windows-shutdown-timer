@@ -52,10 +52,10 @@
             this.stopTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.createTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stopTimerContextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.add10MinutesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.add10MinutesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stopTimerContextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.main_menu.SuspendLayout();
             this.contextMenuStrip.SuspendLayout();
@@ -155,21 +155,21 @@
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.optionsToolStripMenuItem.Text = "Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -190,41 +190,41 @@
             this.add_1_hr_menu_item,
             this.add_2_hr_menu_item});
             this.addTimerToolStripMenuItem.Name = "addTimerToolStripMenuItem";
-            this.addTimerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.addTimerToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.addTimerToolStripMenuItem.Text = "Add Time";
             // 
             // add_5_min_menu_item
             // 
             this.add_5_min_menu_item.Name = "add_5_min_menu_item";
-            this.add_5_min_menu_item.Size = new System.Drawing.Size(152, 22);
+            this.add_5_min_menu_item.Size = new System.Drawing.Size(132, 22);
             this.add_5_min_menu_item.Text = "5 Minutes";
             this.add_5_min_menu_item.Click += new System.EventHandler(this.add_5_min_menu_item_Click);
             // 
             // add_30_min_menu_item
             // 
             this.add_30_min_menu_item.Name = "add_30_min_menu_item";
-            this.add_30_min_menu_item.Size = new System.Drawing.Size(152, 22);
+            this.add_30_min_menu_item.Size = new System.Drawing.Size(132, 22);
             this.add_30_min_menu_item.Text = "30 Minutes";
             this.add_30_min_menu_item.Click += new System.EventHandler(this.add_30_min_menu_item_Click);
             // 
             // add_1_hr_menu_item
             // 
             this.add_1_hr_menu_item.Name = "add_1_hr_menu_item";
-            this.add_1_hr_menu_item.Size = new System.Drawing.Size(152, 22);
+            this.add_1_hr_menu_item.Size = new System.Drawing.Size(132, 22);
             this.add_1_hr_menu_item.Text = "1 Hour";
             this.add_1_hr_menu_item.Click += new System.EventHandler(this.add_1_hr_menu_item_Click);
             // 
             // add_2_hr_menu_item
             // 
             this.add_2_hr_menu_item.Name = "add_2_hr_menu_item";
-            this.add_2_hr_menu_item.Size = new System.Drawing.Size(152, 22);
+            this.add_2_hr_menu_item.Size = new System.Drawing.Size(132, 22);
             this.add_2_hr_menu_item.Text = "2 Hours";
             this.add_2_hr_menu_item.Click += new System.EventHandler(this.add_2_hr_menu_item_Click);
             // 
             // stopTimerToolStripMenuItem
             // 
             this.stopTimerToolStripMenuItem.Name = "stopTimerToolStripMenuItem";
-            this.stopTimerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stopTimerToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.stopTimerToolStripMenuItem.Text = "Stop Timer";
             this.stopTimerToolStripMenuItem.Click += new System.EventHandler(this.stopTimerToolStripMenuItem_Click);
             // 
@@ -234,6 +234,7 @@
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
             this.notifyIcon.Text = "notifyIcon1";
             this.notifyIcon.Visible = true;
+            this.notifyIcon.Click += new System.EventHandler(this.notifyIcon_Click);
             this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
             // 
             // contextMenuStrip
@@ -244,7 +245,14 @@
             this.add10MinutesToolStripMenuItem,
             this.stopTimerContextToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(158, 114);
+            this.contextMenuStrip.Size = new System.Drawing.Size(158, 92);
+            // 
+            // showTimerToolStripMenuItem
+            // 
+            this.showTimerToolStripMenuItem.Name = "showTimerToolStripMenuItem";
+            this.showTimerToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.showTimerToolStripMenuItem.Text = "Show Timer";
+            this.showTimerToolStripMenuItem.Click += new System.EventHandler(this.showTimerToolStripMenuItem_Click);
             // 
             // createTimerToolStripMenuItem
             // 
@@ -253,13 +261,6 @@
             this.createTimerToolStripMenuItem.Text = "Create Timer";
             this.createTimerToolStripMenuItem.Click += new System.EventHandler(this.createTimerToolStripMenuItem_Click);
             // 
-            // stopTimerContextToolStripMenuItem
-            // 
-            this.stopTimerContextToolStripMenuItem.Name = "stopTimerContextToolStripMenuItem";
-            this.stopTimerContextToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
-            this.stopTimerContextToolStripMenuItem.Text = "Stop Timer";
-            this.stopTimerContextToolStripMenuItem.Click += new System.EventHandler(this.stopTimerToolStripMenuItem_Click);
-            // 
             // add10MinutesToolStripMenuItem
             // 
             this.add10MinutesToolStripMenuItem.Name = "add10MinutesToolStripMenuItem";
@@ -267,12 +268,12 @@
             this.add10MinutesToolStripMenuItem.Text = "Add 10 Minutes";
             this.add10MinutesToolStripMenuItem.Click += new System.EventHandler(this.add_10_min_menu_item_Click);
             // 
-            // showTimerToolStripMenuItem
+            // stopTimerContextToolStripMenuItem
             // 
-            this.showTimerToolStripMenuItem.Name = "showTimerToolStripMenuItem";
-            this.showTimerToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
-            this.showTimerToolStripMenuItem.Text = "Show Timer";
-            this.showTimerToolStripMenuItem.Click += new System.EventHandler(this.showTimerToolStripMenuItem_Click);
+            this.stopTimerContextToolStripMenuItem.Name = "stopTimerContextToolStripMenuItem";
+            this.stopTimerContextToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.stopTimerContextToolStripMenuItem.Text = "Stop Timer";
+            this.stopTimerContextToolStripMenuItem.Click += new System.EventHandler(this.stopTimerToolStripMenuItem_Click);
             // 
             // TimerForm
             // 

@@ -25,14 +25,26 @@ namespace WindowsShutdownTimer
                 minimize_to_sys_tray.Checked = true;
             else
                 minimize_to_sys_tray.Checked = false;
+
+            if (Properties.Settings.Default.LClickOpenSysTray)
+                left_click_open_sys_tray.Checked = true;
+            else
+                left_click_open_sys_tray.Checked = false;
         }
 
         public void save_options_button_Click(object sender, EventArgs e)
         { 
+            // Minimize program to system tray rather than to the taskbar.
             if (minimize_to_sys_tray.Checked)
                 Properties.Settings.Default.MinimizePref = true;
             else
                 Properties.Settings.Default.MinimizePref = false;
+            
+            // Single left click to re-show program when clicking icon in system tray.
+            if (left_click_open_sys_tray.Checked)
+                Properties.Settings.Default.LClickOpenSysTray = true;
+            else
+                Properties.Settings.Default.LClickOpenSysTray = false;
 
             Properties.Settings.Default.Save();
             timerWindow.ApplyUserSettings();

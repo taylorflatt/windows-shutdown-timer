@@ -45,5 +45,17 @@ namespace WindowsShutdownTimer.Properties {
                 this["ShutdownTimer"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LClickOpenSysTray {
+            get {
+                return ((bool)(this["LClickOpenSysTray"]));
+            }
+            set {
+                this["LClickOpenSysTray"] = value;
+            }
+        }
     }
 }
