@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -12,8 +13,6 @@ using System.Windows.Forms;
 /// to this other than not doing any sort of setting set prior to an initial change. That will add some additional overhead inline 
 /// since I will need to store local versions of the default variables and check if settings have been enabled and switch over at that 
 /// point. Not sure if it is really worth it to be honest.
-/// 
-/// TODO: Add a check for updates function (https://msdn.microsoft.com/en-us/library/1zyc39fb.aspx.
 /// 
 
 namespace WindowsShutdownTimer
@@ -31,7 +30,7 @@ namespace WindowsShutdownTimer
         /// Sets the initial program parameters.
         /// </summary>
         public TimerForm()
-        {
+        { 
             InitializeComponent();
 
             this.Name = "Shutdown Windows Timer";
@@ -52,6 +51,15 @@ namespace WindowsShutdownTimer
 
             EnableStopTimerButtons();       // Decided to always have this enabled in case they want to stop another timer not created by this program. No real harm.
             DisableModifyTimerButtons();    // Immediately disable this the add time option and re-enable later when necessary.
+
+            // If first run, then welcome the user and notify that they may remove the old program.
+            /// Remark: I was going to put something here to remove the old program but there are really too many variables to consider without creating an updater 
+            /// or using a service to handle it. Since this app is pretty small and the program can be deleted easily then I leave it up to the user to do so.
+            if (Properties.Settings.Default.FirstRun == true)
+            {
+                MessageBox.Show("This appears to be the first time running this program. If you are new, then Welcome! If you have updated from a previous version, then " +
+                    "you may now safely remove the previous version of the program.", "Welcome to Windows Shutdown Timer!", MessageBoxButtons.OK);
+            }
         }
 
         /// <summary>
@@ -61,6 +69,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void TimerForm_Load(object sender, EventArgs e)
         {
+
+
             // If the last shutdown time was scheduled after the current time then go ahead and redisplay it
             // so the user can see it. I do a hard reset on the timer so this could result in a timer created 
             // by SOMETHING ELSE being removed and this one superseding it.
