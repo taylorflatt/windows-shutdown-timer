@@ -428,6 +428,7 @@ namespace WindowsShutdownTimer
         private void add_2_hr_menu_item_Click(object sender, EventArgs e)
         {
             _shutdownTime = _shutdownTime.AddHours(2);
+            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
             Properties.Settings.Default.Save();
         }
 
@@ -439,6 +440,7 @@ namespace WindowsShutdownTimer
         private void add_1_hr_menu_item_Click(object sender, EventArgs e)
         {
             _shutdownTime = _shutdownTime.AddHours(1);
+            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
             Properties.Settings.Default.Save();
         }
 
@@ -450,6 +452,7 @@ namespace WindowsShutdownTimer
         private void add_30_min_menu_item_Click(object sender, EventArgs e)
         {
             _shutdownTime = _shutdownTime.AddMinutes(30);
+            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
             Properties.Settings.Default.Save();
         }
 
@@ -461,6 +464,7 @@ namespace WindowsShutdownTimer
         private void add_10_min_menu_item_Click(object sender, EventArgs e)
         {
             _shutdownTime = _shutdownTime.AddMinutes(10);
+            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
             Properties.Settings.Default.Save();
         }
 
@@ -472,6 +476,7 @@ namespace WindowsShutdownTimer
         private void add_5_min_menu_item_Click(object sender, EventArgs e)
         {
             _shutdownTime = _shutdownTime.AddMinutes(5);
+            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
             Properties.Settings.Default.Save();
         }
 
