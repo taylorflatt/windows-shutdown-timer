@@ -104,6 +104,7 @@ namespace WindowsShutdownTimer
             var currentVersion = typeof(Options).Assembly.GetName().Version.ToString();
 
             System.Net.WebClient wc = new System.Net.WebClient();
+            wc.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
             string webVersion = wc.DownloadString(@"https://raw.githubusercontent.com/taylorflatt/windows-shutdown-timer/master/VERSION").TrimEnd('\n');
 
             Array webV = webVersion.Split('.');
