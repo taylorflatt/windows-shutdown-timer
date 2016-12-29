@@ -122,13 +122,33 @@ namespace WindowsShutdownTimer
                         string newFilePath = AppDomain.CurrentDomain.BaseDirectory + "WindowsShutdownTimer_v" + webVersion + ".exe";     // This should be distinct from old by version number.
                         string updatedAppLocation = "https://github.com/taylorflatt/windows-shutdown-timer/raw/master/WindowsShutdownTimer.exe";
 
-                        wc.DownloadFile(new Uri(updatedAppLocation), newFilePath);
+                        try
+                        {
+                            wc.DownloadFile(new Uri(updatedAppLocation), newFilePath);
+
+                            DialogResult close = MessageBox.Show("You have successfully updated to version " + webVersion + "! The new version was downloaded to the same directory as this " +
+                                "program. Would you like to close this program now?", "Update Completed!", MessageBoxButtons.YesNo);
+
+                            if (close == DialogResult.Yes)
+                                Application.Exit();
+                            else
+                                return;
+                        }
+
+                        catch
+                        {
+                            DialogResult error = MessageBox.Show("There was an error attempting to grab the newest update. Would you like to " +
+                                "retry or cancel?", "Error Downloading Update!", MessageBoxButtons.RetryCancel);
+
+                            if (error == DialogResult.Retry)
+                                check_update_button_Click(null, null);
+                            else
+                                return;
+                        }
                     }
 
                     else
                         return;
-
-                    break;
                 }
             }
 
