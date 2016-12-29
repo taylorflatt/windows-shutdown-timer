@@ -6,7 +6,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ShutdownTimer" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">2015-01-01</Value>
     </Setting>
     <Setting Name="LClickOpenSysTray" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

@@ -78,15 +78,15 @@ namespace WindowsShutdownTimer
             if (webVersion != currentVersion)
             {
                 DialogResult result = MessageBox.Show("The current version is: " + currentVersion + " and the newest version is " + webVersion + ". Would you " +
-                    "like to download the newest version?", "New Version Found", MessageBoxButtons.YesNoCancel);
+                    "like to download the newest version?", "New Version Found!", MessageBoxButtons.YesNoCancel);
 
                 if (result == DialogResult.Yes)
                 {
                     string exeName = typeof(Options).Assembly.GetName().ToString();
-                    string newFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location + exeName + "v_" + currentVersion;     // This should be distinct from old by version number.
+                    string newFilePath = AppDomain.CurrentDomain.BaseDirectory;     // This should be distinct from old by version number.
                     string updatedAppLocation = "https://github.com/taylorflatt/windows-shutdown-timer/blob/master/WindowsShutdownTimer.exe";
 
-                    wc.DownloadFile(updatedAppLocation, newFilePath);
+                    wc.DownloadFile(updatedAppLocation, newFilePath + "WindowsShutdownTimer_v" + webVersion + ".exe");
                 }
             }
         }

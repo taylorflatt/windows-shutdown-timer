@@ -57,6 +57,10 @@ namespace WindowsShutdownTimer
             /// or using a service to handle it. Since this app is pretty small and the program can be deleted easily then I leave it up to the user to do so.
             if (Properties.Settings.Default.FirstRun == true)
             {
+                // Very important! For some reason I couldn't set it to the default in the settings for VS so I have to set it to a random date.
+                // that should be overwritten the moment the program is started for the first time.
+                Properties.Settings.Default.ShutdownTimer = default(DateTime);
+                Properties.Settings.Default.Save();
                 MessageBox.Show("This appears to be the first time running this program. If you are new, then Welcome! If you have updated from a previous version, then " +
                     "you may now safely remove the previous version of the program.", "Welcome to Windows Shutdown Timer!", MessageBoxButtons.OK);
             }
