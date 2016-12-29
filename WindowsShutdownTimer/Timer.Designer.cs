@@ -291,6 +291,7 @@
             this.MaximizeBox = false;
             this.Name = "TimerForm";
             this.Text = "Shutdown Windows";
+            this.Load += new System.EventHandler(this.TimerForm_Load);
             this.Resize += new System.EventHandler(this.TimerForm_Resize);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

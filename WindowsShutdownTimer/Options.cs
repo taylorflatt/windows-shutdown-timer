@@ -16,7 +16,15 @@ namespace WindowsShutdownTimer
             timerWindow.Enabled = false;
 
             last_shutdown_label_desc.Text = "Last Shutdown: ";
-            last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer.ToLocalTime());
+
+            // Check on the status of the previous shutdown. If it was ever set or cancelled. 
+            // Or if it is still in the future (pending). Or successful then display when.
+            if (Properties.Settings.Default.ShutdownTimer == default(DateTime))
+                last_shutdown_label.Text = "N/A or Unsuccessful";
+            else if(Properties.Settings.Default.ShutdownTimer > DateTime.UtcNow.ToLocalTime())
+                last_shutdown_label.Text = "Pending " + "(" + Convert.ToString(Properties.Settings.Default.ShutdownTimer.ToLocalTime()) + ")";
+            else
+                last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer.ToLocalTime());
         }
 
         private void Options_Load(object sender, EventArgs e)

@@ -20,6 +20,7 @@ namespace WindowsShutdownTimer
 {
     public partial class TimerForm : Form
     {
+        #region Main
         /// <summary>
         /// Tracks the current time and the projected shutdown time. Used for calculating remaining time to display to the user.
         /// </summary>
@@ -27,7 +28,7 @@ namespace WindowsShutdownTimer
         public DateTime _shutdownTime;
 
         /// <summary>
-        /// Initial program parameters.
+        /// Sets the initial program parameters.
         /// </summary>
         public TimerForm()
         {
@@ -44,14 +45,22 @@ namespace WindowsShutdownTimer
             _currentTime = new DateTime();
             _shutdownTime = new DateTime();
 
-            time_remaining_timer.Enabled = false;
+            time_remaining_timer.Enabled = false;   // Enable the tracking timer.
             time_remaining_timer.Interval = 1000;   // Check time remaining every 1 seconds.
             time_remaining_desc_label.Text = "Time Remaining: ";
             time_remaining_label.Text = "0 hr 0 min 0 sec";
 
-            EnableStopTimerButtons();
-            DisableModifyTimerButtons();
+            EnableStopTimerButtons();       // Decided to always have this enabled in case they want to stop another timer not created by this program. No real harm.
+            DisableModifyTimerButtons();    // Immediately disable this the add time option and re-enable later when necessary.
+        }
 
+        /// <summary>
+        /// Runs on program load and checks if a timer is currently running and redisplays it if necessary.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimerForm_Load(object sender, EventArgs e)
+        {
             // If the last shutdown time was scheduled after the current time then go ahead and redisplay it
             // so the user can see it. I do a hard reset on the timer so this could result in a timer created 
             // by SOMETHING ELSE being removed and this one superseding it.
@@ -72,30 +81,49 @@ namespace WindowsShutdownTimer
             }
         }
 
+        #endregion
+
+        #region Helper Functions
+
+        /// <summary>
+        /// Enables the add time buttons in the menu and system tray menu.
+        /// </summary>
         private void EnableModifyTimerButtons()
         {
             addTimerToolStripMenuItem.Enabled = true;
             add10MinutesToolStripMenuItem.Enabled = true;
         }
 
+        /// <summary>
+        /// Disables the add time buttons in the menu and system tray menu.
+        /// </summary>
         private void DisableModifyTimerButtons()
         {
             addTimerToolStripMenuItem.Enabled = false;
             add10MinutesToolStripMenuItem.Enabled = false;
         }
 
+        /// <summary>
+        /// Enables the stop timer buttons in the menu and system tray menu.
+        /// </summary>
         private void EnableStopTimerButtons()
         {
             stopTimerToolStripMenuItem.Enabled = true;
             stopTimerContextToolStripMenuItem.Enabled = true;
         }
 
+        /// <summary>
+        /// Disables the stop timer buttons in the menu and system tray menu.
+        /// </summary>
         private void DisableStopTimerButtons()
         {
             stopTimerToolStripMenuItem.Enabled = false;
             stopTimerContextToolStripMenuItem.Enabled = false;
         }
 
+        /// <summary>
+        /// Resets the timers for the program.
+        /// </summary>
         private void ResetTimers()
         {
             _currentTime = default(DateTime);
@@ -213,7 +241,9 @@ namespace WindowsShutdownTimer
 
             else
             {
-                if(reset)
+                Properties.Settings.Default.ShutdownTimer = default(DateTime);
+
+                if (reset)
                 {
                     createTimerToolStripMenuItem.Enabled = true;
 
@@ -239,8 +269,10 @@ namespace WindowsShutdownTimer
         /// <returns>Returns whether or not a shutdown timer has been initiated by any program.</returns>
         private bool ShutdownTimerExists(int numMinutes = 500000, bool stopOtherTimer = false)
         {
+            SetCurrentTime();
+
             // If the program hasn't created a timer OR the last saved timer is default, check for an existing timer.
-            if(Properties.Settings.Default.ShutdownTimer == DateTime.MinValue || _shutdownTime == DateTime.MinValue)
+            if (Properties.Settings.Default.ShutdownTimer == DateTime.MinValue || _shutdownTime == DateTime.MinValue)
             {
                 // Create a temporary shutdown command to see if it succeedes and then immediately stop it if it was created.
                 string cmd = "/C shutdown -s -t " + numMinutes + " && shutdown /a";
@@ -251,8 +283,15 @@ namespace WindowsShutdownTimer
                     return true;
             }
 
+            // The program created the timer and the time is still in the future relative to the current time.
+            else if (Properties.Settings.Default.ShutdownTimer > _currentTime)
+                return true;
+
             return false;
         }
+        #endregion
+
+        #region Event Handlers
 
         /// <summary>
         /// Adds the shutdown timer for a particular number of minutes.
@@ -273,7 +312,7 @@ namespace WindowsShutdownTimer
                 {
                     /// TODO: Add my own custom dialog box to customize the options so they aren't confusing.
                     DialogResult result = MessageBox.Show("A timer to shutdown Windows already exists. Would you like to stop that timer and add yours for "
-                        + numMinutes + " minutes from now? Or choose no to simply stop the other timer without adding the new one. Otherwise choose cancel to take " +
+                        + numMinutes + " minutes from now? Or choose 'No' to simply stop the other timer without adding the new one. Otherwise choose 'Cancel' to take " +
                         "no action.", "Stop Existing Timer", MessageBoxButtons.YesNoCancel);
 
                     // Remove old timer and add the new one.
@@ -286,7 +325,7 @@ namespace WindowsShutdownTimer
                     // Remove old timer only.
                     else if (result == DialogResult.No)
                     {
-                        StopShutdownTimer(false);
+                        StopShutdownTimer(true);
                         ResetTimers();
                     }
 
@@ -366,16 +405,6 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
-        /// Displays the About information for the program.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Created and maintained by Taylor Flatt. More information can be found at https://github.com/taylorflatt/windows-shutdown-timer.", "About", MessageBoxButtons.OK);
-        }
-
-        /// <summary>
         /// Adds two hours to the shutdown timer.
         /// </summary>
         /// <param name="sender"></param>
@@ -409,6 +438,17 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Adds 10 minutes to the shutdown timer.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void add_10_min_menu_item_Click(object sender, EventArgs e)
+        {
+            _shutdownTime = _shutdownTime.AddMinutes(10);
+            Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
         /// Adds 5 minutes to the shutdown timer.
         /// </summary>
         /// <param name="sender"></param>
@@ -420,13 +460,16 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
-        /// Exits the program.
+        /// The stop timer button in the menu that when clicked will stop any shutdown timer.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void stopTimerToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            if (_shutdownTime == default(DateTime))
+                StopShutdownTimer(false);
+            else
+                StopShutdownTimer(true);
         }
 
         /// <summary>
@@ -447,6 +490,54 @@ namespace WindowsShutdownTimer
             }
         }
 
+        /// <summary>
+        /// When the icon in the system tray is double clicked, the app will be displayed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void notifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Normal;
+        }
+
+        /// <summary>
+        /// When the create button is clicked in the menu, the app will be displayed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Normal;
+        }
+
+        /// <summary>
+        /// When the show timer button is clicked in the menu, the app will be displayed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Normal;
+        }
+
+        /// <summary>
+        /// When the icon in the system tray is clicked, the app will be displayed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>This depends completely on user settings and will not fire unless the user has selected the option in the options form.</remarks>
+        private void notifyIcon_Click(object sender, EventArgs e)
+        {
+            // Only re-show the app if the user has selected it.
+            if (Properties.Settings.Default.LClickOpenSysTray)
+                WindowState = FormWindowState.Normal;
+        }
+
+        /// <summary>
+        /// The options button in the menu that when clicked will create an options instance.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Options optionsForm = new Options(this);
@@ -458,40 +549,26 @@ namespace WindowsShutdownTimer
             optionsForm.Name = this.Name + " Options";
         }
 
-        private void notifyIcon_DoubleClick(object sender, EventArgs e)
+        /// <summary>
+        /// Displays the About information for the program.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
+            MessageBox.Show("Created and maintained by Taylor Flatt. More information can be found at https://github.com/taylorflatt/windows-shutdown-timer.", "About", MessageBoxButtons.OK);
         }
 
-        private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Exits the program.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
+            Application.Exit();
         }
 
-        private void stopTimerToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            if (_shutdownTime == default(DateTime))
-                StopShutdownTimer(false);
-            else
-                StopShutdownTimer(true);
-        }
-
-        private void add_10_min_menu_item_Click(object sender, EventArgs e)
-        {
-            _shutdownTime = _shutdownTime.AddMinutes(10);
-            Properties.Settings.Default.Save();
-        }
-
-        private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            WindowState = FormWindowState.Normal;
-        }
-
-        private void notifyIcon_Click(object sender, EventArgs e)
-        {
-            // Only re-show the app if the user has selected it.
-            if (Properties.Settings.Default.LClickOpenSysTray)
-                WindowState = FormWindowState.Normal;
-        }
+        #endregion
     }
 }
