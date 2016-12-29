@@ -416,6 +416,8 @@ namespace WindowsShutdownTimer
 
                     // Add an additional 5 minutes to the timer to diagnose the issue.
                     _shutdownTime.AddMinutes(5);
+                    Properties.Settings.Default.ShutdownTimer = _shutdownTime;
+                    Properties.Settings.Default.Save();
                 }
             }
         }
@@ -492,6 +494,23 @@ namespace WindowsShutdownTimer
                 StopShutdownTimer(false);
             else
                 StopShutdownTimer(true);
+        }
+
+        /// <summary>
+        /// Shuts the computer off after 10 seconds.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void shutdownNowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult confirm = MessageBox.Show("Are you sure you want to shutdown now?", "WARNING", MessageBoxButtons.OKCancel);
+
+            if (confirm == DialogResult.OK)
+            {
+                string cmd = "/C shutdown /s /t 10";
+                var process = Process.Start("CMD.exe", cmd);
+                process.WaitForExit();
+            }
         }
 
         /// <summary>
@@ -576,9 +595,11 @@ namespace WindowsShutdownTimer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        /// TODO: Create clickable link.
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Created and maintained by Taylor Flatt. More information can be found at https://github.com/taylorflatt/windows-shutdown-timer.", "About", MessageBoxButtons.OK);
+            MessageBox.Show("Current Version: " + typeof(Options).Assembly.GetName().Version.ToString() + ". Created by Taylor Flatt. More information can be found " +
+                "at https://github.com/taylorflatt/windows-shutdown-timer.", "About Windows Shutdown Timer", MessageBoxButtons.OK);
         }
 
         /// <summary>
@@ -592,5 +613,11 @@ namespace WindowsShutdownTimer
         }
 
         #endregion
+
+        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options tempOptions = new Options(new TimerForm());
+            tempOptions.check_update_button_Click(null, null);
+        }
     }
 }

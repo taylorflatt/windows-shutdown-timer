@@ -99,7 +99,7 @@ namespace WindowsShutdownTimer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void check_update_button_Click(object sender, EventArgs e)
+        public void check_update_button_Click(object sender, EventArgs e)
         {
             var currentVersion = typeof(Options).Assembly.GetName().Version.ToString();
 
