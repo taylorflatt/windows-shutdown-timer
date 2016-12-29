@@ -24,7 +24,7 @@ There aren't any program breaking issues as of yet. If you discover any, please 
 
 ## Requirements
 
-* Windows 10
+* Windows 10, Windows 8
 * [.NET Framework 4.5.2](https://www.microsoft.com/en-us/download/details.aspx?id=42642) or better
 
 Currently only tested working on Windows 10. It should work just fine for Windows 8 and Windows 7 but I have yet to test it on those.
