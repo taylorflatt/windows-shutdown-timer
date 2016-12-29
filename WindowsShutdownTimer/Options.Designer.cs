@@ -32,11 +32,15 @@
             this.options_group_box = new System.Windows.Forms.GroupBox();
             this.minimize_to_sys_tray = new System.Windows.Forms.CheckBox();
             this.save_options_button = new System.Windows.Forms.Button();
+            this.last_shutdown_label_desc = new System.Windows.Forms.Label();
+            this.last_shutdown_label = new System.Windows.Forms.Label();
             this.options_group_box.SuspendLayout();
             this.SuspendLayout();
             // 
             // options_group_box
             // 
+            this.options_group_box.Controls.Add(this.last_shutdown_label);
+            this.options_group_box.Controls.Add(this.last_shutdown_label_desc);
             this.options_group_box.Controls.Add(this.minimize_to_sys_tray);
             this.options_group_box.Location = new System.Drawing.Point(12, 12);
             this.options_group_box.Name = "options_group_box";
@@ -65,6 +69,24 @@
             this.save_options_button.UseVisualStyleBackColor = true;
             this.save_options_button.Click += new System.EventHandler(this.save_options_button_Click);
             // 
+            // last_shutdown_label_desc
+            // 
+            this.last_shutdown_label_desc.AutoSize = true;
+            this.last_shutdown_label_desc.Location = new System.Drawing.Point(6, 92);
+            this.last_shutdown_label_desc.Name = "last_shutdown_label_desc";
+            this.last_shutdown_label_desc.Size = new System.Drawing.Size(84, 13);
+            this.last_shutdown_label_desc.TabIndex = 1;
+            this.last_shutdown_label_desc.Text = "Last Shutdown: ";
+            // 
+            // last_shutdown_label
+            // 
+            this.last_shutdown_label.AutoSize = true;
+            this.last_shutdown_label.Location = new System.Drawing.Point(96, 92);
+            this.last_shutdown_label.Name = "last_shutdown_label";
+            this.last_shutdown_label.Size = new System.Drawing.Size(35, 13);
+            this.last_shutdown_label.TabIndex = 2;
+            this.last_shutdown_label.Text = "label1";
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -88,5 +110,7 @@
         private System.Windows.Forms.GroupBox options_group_box;
         private System.Windows.Forms.Button save_options_button;
         private System.Windows.Forms.CheckBox minimize_to_sys_tray;
+        private System.Windows.Forms.Label last_shutdown_label_desc;
+        private System.Windows.Forms.Label last_shutdown_label;
     }
 }

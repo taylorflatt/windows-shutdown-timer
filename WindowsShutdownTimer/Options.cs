@@ -14,6 +14,9 @@ namespace WindowsShutdownTimer
 
             timerWindow = parent;
             timerWindow.Enabled = false;
+
+            last_shutdown_label_desc.Text = "Last Shutdown: ";
+            last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer.ToLocalTime());
         }
 
         private void Options_Load(object sender, EventArgs e)

@@ -37,10 +37,9 @@ namespace WindowsShutdownTimer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:00:00")]
-        public global::System.TimeSpan ShutdownTimer {
+        public global::System.DateTime ShutdownTimer {
             get {
-                return ((global::System.TimeSpan)(this["ShutdownTimer"]));
+                return ((global::System.DateTime)(this["ShutdownTimer"]));
             }
             set {
                 this["ShutdownTimer"] = value;
