@@ -1,4 +1,4 @@
-# Windows Shutdown Timer
+# Portable Windows Shutdown Timer
 A basic Windows shutdown timer. I use this personally but it is available for anyone to use. 
 
 **Note**: This is still a WIP so the release will change fairly rapidly for the next few days (12/28/16). Until I add an update option, check back here for the most updated version.
@@ -10,6 +10,7 @@ Creates timer that will shutdown windows after a specified number of minutes. It
 ## Features
 
 * Shutdown Windows after specified number of minutes.
+* No installation/uninstallation required.
 * Can minimize/close without impacting the shutdown timer.
 * Can add/subtract additional time to a shutdown timer.
 * Can stop an existing shutdown timer (created by this program or not). You will be prompted to confirm the cancellation.
@@ -31,7 +32,7 @@ Currently only tested working on Windows 10. It should work just fine for Window
 
 ## Usage
 
-Download [WindowsShutdownTimer.exe](https://github.com/taylorflatt/windows-shutdown-timer/raw/master/WindowsShutdownTimer.exe) located in the repository anywhere to your computer and simply run it. No installation is required. The only file stored is noted below.
+Download the [latest release](https://github.com/taylorflatt/windows-shutdown-timer/releases) and run it somewhere on your desktop. No installation required. Note, if you end up ever updating it via the updater, the new version will be downloaded to the same directory as the old version.
 
 ## Notes
 
