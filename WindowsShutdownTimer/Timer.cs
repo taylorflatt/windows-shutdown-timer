@@ -53,27 +53,16 @@ namespace WindowsShutdownTimer
             DisableModifyTimerButtons();    // Immediately disable this the add time option and re-enable later when necessary.
 
             // If first run, then welcome the user and notify that they may remove the old program.
-            /// Remark: I was going to put something here to remove the old program but there are really too many variables to consider without creating an updater 
-            /// or using a service to handle it. Since this app is pretty small and the program can be deleted easily then I leave it up to the user to do so.
             if (Properties.Settings.Default.FirstRun == true)
             {
                 // Very important! For some reason I couldn't set it to the default in the settings for VS so I have to set it to a random date.
                 // that should be overwritten the moment the program is started for the first time.
                 Properties.Settings.Default.ShutdownTimer = default(DateTime);
+                Properties.Settings.Default.FirstRun = false;
                 Properties.Settings.Default.Save();
                 MessageBox.Show("This appears to be the first time running this program. If you are new, then Welcome! If you have updated from a previous version, then " +
                     "you may now safely remove the previous version of the program.", "Welcome to Windows Shutdown Timer!", MessageBoxButtons.OK);
             }
-        }
-
-        /// <summary>
-        /// Runs on program load and checks if a timer is currently running and redisplays it if necessary.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TimerForm_Load(object sender, EventArgs e)
-        {
-
 
             // If the last shutdown time was scheduled after the current time then go ahead and redisplay it
             // so the user can see it. I do a hard reset on the timer so this could result in a timer created 
