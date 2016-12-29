@@ -37,18 +37,6 @@ namespace WindowsShutdownTimer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2000-01-01")]
-        public global::System.DateTime ShutdownTimer {
-            get {
-                return ((global::System.DateTime)(this["ShutdownTimer"]));
-            }
-            set {
-                this["ShutdownTimer"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool LClickOpenSysTray {
             get {
@@ -68,6 +56,18 @@ namespace WindowsShutdownTimer.Properties {
             }
             set {
                 this["FirstRun"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0002-01-01")]
+        public global::System.DateTime ShutdownTimer {
+            get {
+                return ((global::System.DateTime)(this["ShutdownTimer"]));
+            }
+            set {
+                this["ShutdownTimer"] = value;
             }
         }
     }

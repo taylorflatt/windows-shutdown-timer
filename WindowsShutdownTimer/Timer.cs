@@ -41,7 +41,8 @@ namespace WindowsShutdownTimer
             description_label.MaximumSize = new System.Drawing.Size(325, 0);
             description_label.Text = "Enter the number minutes from now that you would like to shut down Windows (e.g. 5 for 5 minutes from now).";
 
-            _currentTime = new DateTime();
+            SetCurrentTime();
+
             _shutdownTime = new DateTime();
 
             time_remaining_timer.Enabled = false;   // Enable the tracking timer.
@@ -57,7 +58,7 @@ namespace WindowsShutdownTimer
             {
                 // Very important! For some reason I couldn't set it to the default in the settings for VS so I have to set it to a random date.
                 // that should be overwritten the moment the program is started for the first time.
-                Properties.Settings.Default.ShutdownTimer = default(DateTime);
+                Properties.Settings.Default.ShutdownTimer = SetDefaultDateTime(Properties.Settings.Default.ShutdownTimer);
                 Properties.Settings.Default.FirstRun = false;
                 Properties.Settings.Default.Save();
                 MessageBox.Show("This appears to be the first time running this program. If you are new, then Welcome! If you have updated from a previous version, then " +
@@ -71,7 +72,7 @@ namespace WindowsShutdownTimer
             /// TODO: Could mute the sound for the notification (possibly) to help mitigate some of the annoyance.
             if (Properties.Settings.Default.ShutdownTimer > _currentTime)
             {
-                SetCurrentTime();
+                SetCurrentTime();   // Update the current time.
                 var timeRemaining = Properties.Settings.Default.ShutdownTimer.Subtract(_currentTime);
 
                 // Make sure the timer wasn't stopped manually.
@@ -129,8 +130,20 @@ namespace WindowsShutdownTimer
         /// </summary>
         private void ResetTimers()
         {
-            _currentTime = default(DateTime);
-            _shutdownTime = default(DateTime);
+            _currentTime = SetDefaultDateTime(_currentTime);
+            _shutdownTime = SetDefaultDateTime(_shutdownTime);
+        }
+
+        /// <summary>
+        /// Fix the default date so that it will save in the user settings.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <remarks>For some reason, C# won't save 1/1/0001 00:00:00 but it WILL save 1/1/0002 00:00:00. 
+        /// So the DateTime needs a single year added to it for it to work.</remarks>
+        public DateTime SetDefaultDateTime(DateTime obj)
+        {
+            obj = default(DateTime);
+            return obj.AddYears(1);
         }
 
         /// <summary>
@@ -244,7 +257,7 @@ namespace WindowsShutdownTimer
 
             else
             {
-                Properties.Settings.Default.ShutdownTimer = default(DateTime);
+                Properties.Settings.Default.ShutdownTimer = SetDefaultDateTime(Properties.Settings.Default.ShutdownTimer);
 
                 if (reset)
                 {
@@ -469,7 +482,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void stopTimerToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            if (_shutdownTime == default(DateTime))
+            // This needs investigated.
+            if (_shutdownTime == SetDefaultDateTime(_shutdownTime))
                 StopShutdownTimer(false);
             else
                 StopShutdownTimer(true);
