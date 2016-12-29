@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Deployment.Application;
 using System.IO;
 using System.Windows.Forms;
 
@@ -65,6 +66,27 @@ namespace WindowsShutdownTimer
         private void Options_FormClosing(object sender, FormClosingEventArgs e)
         {
             timerWindow.Enabled = true;
+        }
+
+        private void check_update_button_Click(object sender, EventArgs e)
+        {
+            var currentVersion = typeof(Options).Assembly.GetName().Version.ToString();
+
+            System.Net.WebClient wc = new System.Net.WebClient();
+            string webVersion = wc.DownloadString(@"https://raw.githubusercontent.com/taylorflatt/windows-shutdown-timer/master/VERSION").TrimEnd('\n');
+
+            if (webVersion != currentVersion)
+            {
+                DialogResult result = MessageBox.Show("The current version is: " + currentVersion + " and the newest version is " + webVersion + ". Would you " +
+                    "like to get the newest version?", "New Version Found", MessageBoxButtons.YesNoCancel);
+
+                if (result == DialogResult.Yes)
+                {
+                    // Open URL to get the newest version.
+                }
+                else
+                    return;
+            }
         }
     }
 }

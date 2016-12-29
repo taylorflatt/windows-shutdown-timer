@@ -35,6 +35,7 @@
             this.last_shutdown_label_desc = new System.Windows.Forms.Label();
             this.last_shutdown_label = new System.Windows.Forms.Label();
             this.left_click_open_sys_tray = new System.Windows.Forms.CheckBox();
+            this.check_update_button = new System.Windows.Forms.Button();
             this.options_group_box.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -99,11 +100,22 @@
             this.left_click_open_sys_tray.Text = "Left click to open from system tray";
             this.left_click_open_sys_tray.UseVisualStyleBackColor = true;
             // 
+            // check_update_button
+            // 
+            this.check_update_button.Location = new System.Drawing.Point(12, 126);
+            this.check_update_button.Name = "check_update_button";
+            this.check_update_button.Size = new System.Drawing.Size(75, 23);
+            this.check_update_button.TabIndex = 2;
+            this.check_update_button.Text = "Update";
+            this.check_update_button.UseVisualStyleBackColor = true;
+            this.check_update_button.Click += new System.EventHandler(this.check_update_button_Click);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(355, 162);
+            this.Controls.Add(this.check_update_button);
             this.Controls.Add(this.save_options_button);
             this.Controls.Add(this.options_group_box);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -125,5 +137,6 @@
         private System.Windows.Forms.Label last_shutdown_label_desc;
         private System.Windows.Forms.Label last_shutdown_label;
         private System.Windows.Forms.CheckBox left_click_open_sys_tray;
+        private System.Windows.Forms.Button check_update_button;
     }
 }
