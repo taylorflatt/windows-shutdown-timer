@@ -26,7 +26,7 @@ There aren't any program breaking issues as of yet. If you discover any, please 
 * Windows 10, Windows 8, Windows 7*
 * [.NET Framework 4.5.2](https://www.microsoft.com/en-us/download/details.aspx?id=42642) or better
 
-\*Currently only tested working on Windows 10 and Windows 8. It should work just fine for Windows 7 but I have yet to test it. There isn't anything exclusive to Windows 10/8 so it should honestly work just fine on Windows 7.
+\*Currently only tested working on Windows 10 and Windows 8. There isn't anything exclusive to Windows 10/8 so it should honestly work just fine on Windows 7.
 
 ## Usage
 
@@ -34,4 +34,4 @@ Download the [latest release](https://github.com/taylorflatt/windows-shutdown-ti
 
 ## Notes
 
-Any user settings are stored in `%USERPROFILE%/AppData/Local/WindowsShutdownTimer`. 
+Any user settings are stored in `%USERPROFILE%/AppData/Local/WindowsShutdownTimer`. Deleting this file and re-running the program will result in the file being recreated.
