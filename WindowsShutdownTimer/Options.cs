@@ -15,7 +15,7 @@ namespace WindowsShutdownTimer
         /// <summary>
         /// Sets the initial options form parameters as well as set the parent attributes.
         /// </summary>
-        /// <param name="parent"></param>
+        /// <param name="parent">This form's parent.</param>
         public Options(TimerForm parent)
         {
             InitializeComponent();
@@ -25,6 +25,7 @@ namespace WindowsShutdownTimer
 
             last_shutdown_label_desc.Text = "Last Shutdown: ";
 
+            // Because the settings manager won't store a 0001 default DateTime year.
             DateTime defaultDate = new DateTime(0002, 1, 1, 0, 0, 0, 0);
                 
             // Check on the status of the previous shutdown. If it was ever set or cancelled. 
@@ -139,7 +140,7 @@ namespace WindowsShutdownTimer
 
                         catch
                         {
-                            DialogResult error = MessageBox.Show("There was an error attempting to grab the newest update. Would you like to " +
+                            DialogResult error = MessageBox.Show("There was an error attempting to grab the latest update. Would you like to " +
                                 "retry or cancel?", "Error Downloading Update!", MessageBoxButtons.RetryCancel);
 
                             if (error == DialogResult.Retry)
