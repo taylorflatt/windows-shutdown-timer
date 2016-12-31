@@ -164,6 +164,10 @@ namespace WindowsShutdownTimer
         /// </summary>
         private void RestoreForm()
         {
+            // If Windows 7.
+            if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
+                this.Visible = true;
+
             this.WindowState = FormWindowState.Normal;
         }
 
@@ -699,6 +703,10 @@ namespace WindowsShutdownTimer
                 notifyIcon.Visible = false;
                 this.ShowInTaskbar = true;
             }
+
+            // If Windows 7, set the form to invisible so it won't show above the taskbar after a minimization.
+            if (this.WindowState == FormWindowState.Minimized && Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
+                this.Visible = false;
         }
 
         /// <summary>
