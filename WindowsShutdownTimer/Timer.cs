@@ -198,7 +198,11 @@ namespace WindowsShutdownTimer
         {
             SetCurrentTime();   // Important to update to the current time.
 
-            return _shutdownTime.Subtract(_currentTime);
+            if (_shutdownTime > _currentTime)
+                return new TimeSpan(0,0,0,0,0);
+
+            else
+                return _shutdownTime.Subtract(_currentTime);
         }
 
         /// <summary>
@@ -400,7 +404,16 @@ namespace WindowsShutdownTimer
         {
             try
             {
-                time_remaining_label.Text = TimeRemaining().ToString("hh' hr 'mm' min 'ss' sec'");
+                TimeSpan time = TimeRemaining();
+
+                if(time != new TimeSpan(0,0,0,0,0))
+                    // do something
+
+                // If there is time remaining, display it. Otherwise, show that the timer has ended.
+                if(time.Seconds != 0 && time.Minutes != 0 && time.Hours != 0 && time.Days != 0)
+                    time_remaining_label.Text = TimeRemaining().ToString("hh' hr 'mm' min 'ss' sec'");
+                else
+                    time_remaining_label.Text = "0 hr 0 min 0 sec";
             }
             catch(FormatException)
             {
@@ -664,6 +677,20 @@ namespace WindowsShutdownTimer
             Application.Exit();
         }
 
+        /// <summary>
+        /// Called after any form closing event. Save the user's settings in the event they have been deleted.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // In case the settings are deleted before the program exits, save the user's settings prior to exiting.
+            // Adds a bit of overhead but I think it is worth it.
+            Properties.Settings.Default.Save();
+        }
+
         #endregion
+
+
     }
 }
