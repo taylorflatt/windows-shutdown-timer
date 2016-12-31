@@ -44,26 +44,6 @@ namespace WindowsShutdownTimer
         }
     }
 
-    /// <summary>
-    /// Trouble checking for a timer.
-    /// </summary>
-    [Serializable]
-    class CheckTimerException : Exception
-    {
-        public string ErrorCode = "";
-
-        public CheckTimerException() { }
-
-        public CheckTimerException(string message, string code) : base(message)
-        {
-            this.ErrorCode = code;
-        }
-
-        public CheckTimerException(string message, Exception inner, string code) : base(message, inner)
-        {
-            this.ErrorCode = code;
-        }
-    }
 
     /// <summary>
     /// Used to show that the timer has ended. This isn't a true exception. This seemed easier (to read/understand) than traditional logic to me.

@@ -70,6 +70,7 @@ namespace WindowsShutdownTimer
                     // Very important! For some reason I couldn't set it to the default in the settings for VS so I have to set it to a random date.
                     // that should be overwritten the moment the program is started for the first time.
                     Properties.Settings.Default.ShutdownTimer = SetDefaultDateTime(Properties.Settings.Default.ShutdownTimer);
+                    time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
                     Properties.Settings.Default.FirstRun = false;
                     Properties.Settings.Default.Save();
                     MessageBox.Show("This appears to be the first time running this program. If you are new, then Welcome! If you have updated from a previous version, then " +
@@ -455,11 +456,11 @@ namespace WindowsShutdownTimer
                     }
                 }
 
-                catch(CheckTimerException ex)
+                catch(Exception)
                 {
                     DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
                         "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
-                        "select YES. Error Code: " + ex.ErrorCode, "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
+                        "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
 
                     if (report == DialogResult.Yes)
                         Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
