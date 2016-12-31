@@ -30,11 +30,11 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Options));
             this.options_group_box = new System.Windows.Forms.GroupBox();
+            this.left_click_open_sys_tray = new System.Windows.Forms.CheckBox();
+            this.last_shutdown_label = new System.Windows.Forms.Label();
+            this.last_shutdown_label_desc = new System.Windows.Forms.Label();
             this.minimize_to_sys_tray = new System.Windows.Forms.CheckBox();
             this.save_options_button = new System.Windows.Forms.Button();
-            this.last_shutdown_label_desc = new System.Windows.Forms.Label();
-            this.last_shutdown_label = new System.Windows.Forms.Label();
-            this.left_click_open_sys_tray = new System.Windows.Forms.CheckBox();
             this.check_update_button = new System.Windows.Forms.Button();
             this.options_group_box.SuspendLayout();
             this.SuspendLayout();
@@ -51,6 +51,34 @@
             this.options_group_box.TabIndex = 0;
             this.options_group_box.TabStop = false;
             this.options_group_box.Text = "Options";
+            // 
+            // left_click_open_sys_tray
+            // 
+            this.left_click_open_sys_tray.AutoSize = true;
+            this.left_click_open_sys_tray.Location = new System.Drawing.Point(7, 44);
+            this.left_click_open_sys_tray.Name = "left_click_open_sys_tray";
+            this.left_click_open_sys_tray.Size = new System.Drawing.Size(186, 17);
+            this.left_click_open_sys_tray.TabIndex = 3;
+            this.left_click_open_sys_tray.Text = "Left click to open from system tray";
+            this.left_click_open_sys_tray.UseVisualStyleBackColor = true;
+            // 
+            // last_shutdown_label
+            // 
+            this.last_shutdown_label.AutoSize = true;
+            this.last_shutdown_label.Location = new System.Drawing.Point(96, 92);
+            this.last_shutdown_label.Name = "last_shutdown_label";
+            this.last_shutdown_label.Size = new System.Drawing.Size(35, 13);
+            this.last_shutdown_label.TabIndex = 2;
+            this.last_shutdown_label.Text = "label1";
+            // 
+            // last_shutdown_label_desc
+            // 
+            this.last_shutdown_label_desc.AutoSize = true;
+            this.last_shutdown_label_desc.Location = new System.Drawing.Point(6, 92);
+            this.last_shutdown_label_desc.Name = "last_shutdown_label_desc";
+            this.last_shutdown_label_desc.Size = new System.Drawing.Size(84, 13);
+            this.last_shutdown_label_desc.TabIndex = 1;
+            this.last_shutdown_label_desc.Text = "Last Shutdown: ";
             // 
             // minimize_to_sys_tray
             // 
@@ -72,34 +100,6 @@
             this.save_options_button.UseVisualStyleBackColor = true;
             this.save_options_button.Click += new System.EventHandler(this.save_options_button_Click);
             // 
-            // last_shutdown_label_desc
-            // 
-            this.last_shutdown_label_desc.AutoSize = true;
-            this.last_shutdown_label_desc.Location = new System.Drawing.Point(6, 92);
-            this.last_shutdown_label_desc.Name = "last_shutdown_label_desc";
-            this.last_shutdown_label_desc.Size = new System.Drawing.Size(84, 13);
-            this.last_shutdown_label_desc.TabIndex = 1;
-            this.last_shutdown_label_desc.Text = "Last Shutdown: ";
-            // 
-            // last_shutdown_label
-            // 
-            this.last_shutdown_label.AutoSize = true;
-            this.last_shutdown_label.Location = new System.Drawing.Point(96, 92);
-            this.last_shutdown_label.Name = "last_shutdown_label";
-            this.last_shutdown_label.Size = new System.Drawing.Size(35, 13);
-            this.last_shutdown_label.TabIndex = 2;
-            this.last_shutdown_label.Text = "label1";
-            // 
-            // left_click_open_sys_tray
-            // 
-            this.left_click_open_sys_tray.AutoSize = true;
-            this.left_click_open_sys_tray.Location = new System.Drawing.Point(7, 44);
-            this.left_click_open_sys_tray.Name = "left_click_open_sys_tray";
-            this.left_click_open_sys_tray.Size = new System.Drawing.Size(186, 17);
-            this.left_click_open_sys_tray.TabIndex = 3;
-            this.left_click_open_sys_tray.Text = "Left click to open from system tray";
-            this.left_click_open_sys_tray.UseVisualStyleBackColor = true;
-            // 
             // check_update_button
             // 
             this.check_update_button.Location = new System.Drawing.Point(12, 126);
@@ -119,7 +119,9 @@
             this.Controls.Add(this.save_options_button);
             this.Controls.Add(this.options_group_box);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "Options";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Options";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Options_FormClosing);
             this.Load += new System.EventHandler(this.Options_Load);

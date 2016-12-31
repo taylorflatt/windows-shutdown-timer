@@ -23,9 +23,7 @@ namespace WindowsShutdownTimer
         [STAThread]
         static void Main()
         {
-            bool unqiue;
-
-            using (var mutex = new Mutex(true, "WindowsShutdownTimerMutex", out unqiue))
+            using (var mutex = new Mutex(true, "WindowsShutdownTimerMutex", out bool unqiue))
             {
                 if(unqiue)
                 {
