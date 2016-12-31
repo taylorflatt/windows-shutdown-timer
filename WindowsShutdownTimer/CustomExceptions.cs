@@ -8,11 +8,19 @@ namespace WindowsShutdownTimer
     [Serializable]
     class StopTimerException : Exception
     {
+        public string ErrorCode = "";
+
         public StopTimerException() { }
 
-        public StopTimerException(string message) : base(message) { }
+        public StopTimerException(string message, string code) : base(message)
+        {
+            this.ErrorCode = code;
+        }
 
-        public StopTimerException(string message, Exception inner) : base(message, inner) { }
+        public StopTimerException(string message, Exception inner, string code) : base(message, inner)
+        {
+            this.ErrorCode = code;
+        }
     }
 
     /// <summary>
@@ -21,11 +29,19 @@ namespace WindowsShutdownTimer
     [Serializable]
     class StartTimerException : Exception
     {
+        public string ErrorCode = "";
+
         public StartTimerException() { }
 
-        public StartTimerException(string message) : base(message) { }
+        public StartTimerException(string message, string code) : base(message)
+        {
+            this.ErrorCode = code;
+        }
 
-        public StartTimerException(string message, Exception inner) : base(message, inner) { }
+        public StartTimerException(string message, Exception inner, string code) : base(message, inner)
+        {
+            this.ErrorCode = code;
+        }
     }
 
     /// <summary>
@@ -37,7 +53,5 @@ namespace WindowsShutdownTimer
         public TimerEnded() { }
 
         public TimerEnded(string message) : base(message) { }
-
-        public TimerEnded(string message, Exception inner) : base(message, inner) { }
     }
 }
