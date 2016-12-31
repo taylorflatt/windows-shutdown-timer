@@ -65,7 +65,7 @@
             // last_shutdown_label
             // 
             this.last_shutdown_label.AutoSize = true;
-            this.last_shutdown_label.Location = new System.Drawing.Point(96, 92);
+            this.last_shutdown_label.Location = new System.Drawing.Point(133, 92);
             this.last_shutdown_label.Name = "last_shutdown_label";
             this.last_shutdown_label.Size = new System.Drawing.Size(35, 13);
             this.last_shutdown_label.TabIndex = 2;
