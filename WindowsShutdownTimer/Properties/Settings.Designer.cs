@@ -26,12 +26,12 @@ namespace WindowsShutdownTimer.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool MinimizePref {
+        public bool MinimizeToSysTray {
             get {
-                return ((bool)(this["MinimizePref"]));
+                return ((bool)(this["MinimizeToSysTray"]));
             }
             set {
-                this["MinimizePref"] = value;
+                this["MinimizeToSysTray"] = value;
             }
         }
         

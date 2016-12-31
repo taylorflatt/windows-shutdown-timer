@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Deployment.Application;
-using System.IO;
 using System.Windows.Forms;
 
 namespace WindowsShutdownTimer
@@ -22,6 +20,9 @@ namespace WindowsShutdownTimer
 
             timerWindow = parent;
             timerWindow.Enabled = false;
+
+            // Setting this in the design menu doesn't work. Must be set here.
+            this.CenterToParent();
 
             last_shutdown_label_desc.Text = "Last Shutdown: ";
 
@@ -45,7 +46,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void Options_Load(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.MinimizePref)
+            if (Properties.Settings.Default.MinimizeToSysTray)
                 minimize_to_sys_tray.Checked = true;
             else
                 minimize_to_sys_tray.Checked = false;
@@ -65,9 +66,9 @@ namespace WindowsShutdownTimer
         { 
             // Minimize program to system tray rather than to the taskbar.
             if (minimize_to_sys_tray.Checked)
-                Properties.Settings.Default.MinimizePref = true;
+                Properties.Settings.Default.MinimizeToSysTray = true;
             else
-                Properties.Settings.Default.MinimizePref = false;
+                Properties.Settings.Default.MinimizeToSysTray = false;
             
             // Single left click to re-show program when clicking icon in system tray.
             if (left_click_open_sys_tray.Checked)
@@ -117,7 +118,7 @@ namespace WindowsShutdownTimer
                 if(Convert.ToInt32(webV.GetValue(i)) > Convert.ToInt32(curV.GetValue(i)))
                 {
                     DialogResult result = MessageBox.Show("The current version is: " + currentVersion + " and the newest version is " + webVersion + ". Would you " +
-                        "like to download the newest version?", "New Version Found!", MessageBoxButtons.YesNoCancel);
+                        "like to download the newest version?", "New Version Found!", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
                     if (result == DialogResult.Yes)
                     {
@@ -130,7 +131,7 @@ namespace WindowsShutdownTimer
                             wc.DownloadFile(new Uri(updatedAppLocation), newFilePath);
 
                             DialogResult close = MessageBox.Show("You have successfully updated to version " + webVersion + "! The new version was downloaded to the same directory as this " +
-                                "program. Would you like to close this program now?", "Update Completed!", MessageBoxButtons.YesNo);
+                                "program. Would you like to close this program now?", "Update Completed!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
                             if (close == DialogResult.Yes)
                                 Application.Exit();
@@ -141,7 +142,7 @@ namespace WindowsShutdownTimer
                         catch
                         {
                             DialogResult error = MessageBox.Show("There was an error attempting to grab the latest update. Would you like to " +
-                                "retry or cancel?", "Error Downloading Update!", MessageBoxButtons.RetryCancel);
+                                "retry or cancel?", "Error Downloading Update!", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
 
                             if (error == DialogResult.Retry)
                                 check_update_button_Click(null, null);
@@ -155,7 +156,7 @@ namespace WindowsShutdownTimer
                 }
             }
 
-            MessageBox.Show("The current version is: " + currentVersion + " and it is up to date!", "No New Update!", MessageBoxButtons.OK);
+            MessageBox.Show("The current version is: " + currentVersion + " and it is up to date!", "No New Update!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
