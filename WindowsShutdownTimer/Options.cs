@@ -75,7 +75,7 @@ namespace WindowsShutdownTimer
                 Properties.Settings.Default.LClickOpenSysTray = false;
 
             Properties.Settings.Default.Save();
-            timerWindow.ApplyUserSettings();
+            //timerWindow.ApplyUserSettings();
 
             // Close the options form and redisplay the parent.
             ActiveForm.Close();

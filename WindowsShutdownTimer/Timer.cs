@@ -44,6 +44,7 @@ namespace WindowsShutdownTimer
                 this.Name = "Windows Shutdown Timer";
                 this.Text = "Windows Shutdown Timer";
                 this.notifyIcon.Text = "Windows Shutdown Timer";
+                this.ShowInTaskbar = true;
 
                 this.AcceptButton = this.submit_Button;
 
@@ -60,7 +61,6 @@ namespace WindowsShutdownTimer
                 time_remaining_timer.Interval = 1000;   // Check time remaining every 1 seconds.
                 time_remaining_desc_label.Text = "Time Remaining: ";
                 time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
-
 
                 EnableStopTimerButtons();       // Decided to always have this enabled in case they want to stop another timer not created by this program. No real harm.
                 DisableModifyTimerButtons();    // Immediately disable this the add time option and re-enable later when necessary.
@@ -164,9 +164,7 @@ namespace WindowsShutdownTimer
         /// </summary>
         private void RestoreForm()
         {
-            Show();
             this.WindowState = FormWindowState.Normal;
-            this.Visible = true;
         }
 
         /// <summary>
@@ -188,7 +186,10 @@ namespace WindowsShutdownTimer
         public void ApplyUserSettings()
         {
             if (Properties.Settings.Default.MinimizeToSysTray)
+            {
+                this.ShowInTaskbar = false;
                 notifyIcon.Visible = true;
+            }
 
             else
                 notifyIcon.Visible = false;
@@ -687,26 +688,17 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void TimerForm_Resize(object sender, EventArgs e)
         {
-            if (this.WindowState == FormWindowState.Minimized)
+            if (Properties.Settings.Default.MinimizeToSysTray)
             {
-                Hide();
-                ApplyUserSettings();
-
-                //if (Properties.Settings.Default.MinimizeToSysTray)
-                //{
-                //    this.ShowInTaskbar = false;
-                //    //this.Visible = false;
-                //    // If this is windows 7, there is a small problem of it not fully minimizing the first time.
-                //    // Need to simply hide the window as well or it will show a small version right above the taskbar.
-                //    if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
-                //        this.Visible = false;
-                //}
-                //else
-                //    this.ShowInTaskbar = true;
+                notifyIcon.Visible = true;
+                this.ShowInTaskbar = false;
             }
 
             else
-                RestoreForm();
+            {
+                notifyIcon.Visible = false;
+                this.ShowInTaskbar = true;
+            }
         }
 
         /// <summary>
@@ -717,6 +709,8 @@ namespace WindowsShutdownTimer
         private void notifyIcon_DoubleClick(object sender, EventArgs e)
         {
             RestoreForm();
+            TimerForm_Resize(null, null);
+            
         }
 
         /// <summary>
@@ -727,6 +721,7 @@ namespace WindowsShutdownTimer
         private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             RestoreForm();
+            TimerForm_Resize(null, null);
         }
 
         /// <summary>
@@ -737,6 +732,7 @@ namespace WindowsShutdownTimer
         private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             RestoreForm();
+            TimerForm_Resize(null, null);
         }
 
         /// <summary>
@@ -749,7 +745,10 @@ namespace WindowsShutdownTimer
         {
             // Only re-show the app if the user has selected it and they are left clicking (not right clicking).
             if (Properties.Settings.Default.LClickOpenSysTray && e.Button == MouseButtons.Left)
+            {
                 RestoreForm();
+                TimerForm_Resize(null, null);
+            }
         }
 
         /// <summary>
