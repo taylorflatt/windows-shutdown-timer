@@ -223,7 +223,7 @@ namespace WindowsShutdownTimer
             SetShutdownTime(numMinutes);
 
             int timeInSeconds = numMinutes * 60;
-            string cmd = "/C shutdown -s -t " + timeInSeconds;
+            string cmd = "/C shutdown -s -c \"Shutting down Windows via the Windows Shutdown Timer \" -t " + timeInSeconds;
 
             var process = new Process();
             process.StartInfo.CreateNoWindow = true;
@@ -249,7 +249,8 @@ namespace WindowsShutdownTimer
             }
 
             else if (process.ExitCode != 0)
-                throw new StartTimerException("Could not execute the start shutdown command through the command prompt. Windows Shutdown Error Code: " + process.ExitCode);
+                throw new StartTimerException("Could not execute the start shutdown command through the command prompt. Windows Shutdown Error " +
+                    "Code: " + process.ExitCode, process.ExitCode.ToString());
 
             else
             {
@@ -275,7 +276,7 @@ namespace WindowsShutdownTimer
             // Exit Code 1190: A shutdown event is currently in progress. We ignore this event and force the stoppage.
             // Exit Code 1116: No shutdown event currently exists. Great, don't care.
             if (process.ExitCode != 0 && process.ExitCode != 1190 && process.ExitCode != 1116)
-                throw new StopTimerException("Could not execute the stop shutdown command through the command prompt. ");
+                throw new StopTimerException("Could not execute the stop shutdown command through the command prompt. Error Code: " + process.ExitCode, process.ExitCode.ToString());
 
             else
             {
@@ -313,7 +314,7 @@ namespace WindowsShutdownTimer
             if (Properties.Settings.Default.ShutdownTimer == DateTime.MinValue || _shutdownTime == DateTime.MinValue)
             {
                 // Create a temporary shutdown command to see if it succeedes and then immediately stop it if it was created.
-                string cmd = "/C shutdown -s -t " + numMinutes + " && shutdown /a";
+                string cmd = "/C shutdown -s  -c \"Attempting to check if a timer already exists via the Windows Shutdown Timer. \" -t " + numMinutes + " && shutdown /a";
                 var process = Process.Start("CMD.exe", cmd);
                 process.WaitForExit();
 
@@ -340,6 +341,13 @@ namespace WindowsShutdownTimer
         {
             if(int.TryParse(MinutesTextBox.Text, out int numMinutes))
             {
+                // Handle only 
+                if (numMinutes > 5255999)
+                    {
+                        MessageBox.Show("You can't set a timer for longer than a week (10080 minutes). Anything longer is currently not supported.", "ERROR", MessageBoxButtons.OK);
+                        return;
+                    }
+
                 SetCurrentTime();
                 SetShutdownTime(numMinutes);
 
@@ -436,10 +444,10 @@ namespace WindowsShutdownTimer
                     StopShutdownTimer(true);
                 }
 
-                catch (StopTimerException)
+                catch (StopTimerException ex)
                 {
                     MessageBox.Show("Could not stop the shutdown timer for some reason. Adding an additional 5 minutes to the timer. Please run 'shutdown /a' in " +
-                        "the command prompt to stop the timer.", "ERROR", MessageBoxButtons.OK);
+                        "the command prompt to stop the timer. Error Code: " + ex.ErrorCode, "ERROR", MessageBoxButtons.OK);
 
                     // Add an additional 5 minutes to the timer to diagnose the issue.
                     _shutdownTime.AddMinutes(5);
@@ -534,7 +542,7 @@ namespace WindowsShutdownTimer
 
             if (confirm == DialogResult.OK)
             {
-                string cmd = "/C shutdown /s /t 10";
+                string cmd = "/C shutdown /s -c \" Shutting down Windows now via the Windows Shutdown Timer. \" /t 10";
                 var process = Process.Start("CMD.exe", cmd);
                 process.WaitForExit();
             }
@@ -689,7 +697,5 @@ namespace WindowsShutdownTimer
         }
 
         #endregion
-
-
     }
 }
