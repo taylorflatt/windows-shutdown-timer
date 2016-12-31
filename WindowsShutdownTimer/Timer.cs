@@ -24,8 +24,8 @@ namespace WindowsShutdownTimer
         public DateTime _currentTime;
         public DateTime _shutdownTime;
 
-        private const string DEFAULT_TIMER_DISPLAY = "0 days 0 hr 0 min 0 sec";
-        private const string DEFAULT_TASK_NAME = "ScheduledShutdownTimer";
+        public const string DEFAULT_TIMER_DISPLAY = "0 days 0 hr 0 min 0 sec";
+        public const string DEFAULT_TASK_NAME = "ScheduledShutdownTimer";
         private const string SHUTDOWN_COMMAND = "echo \"Hello!\" ";
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace WindowsShutdownTimer
                 {
                     try
                     {
-                        _shutdownTime = GetPreviousTimer(DEFAULT_TASK_NAME, true);
-                        time_remaining_timer_Tick(null, null);
+                        _shutdownTime = GetRunningTimer(DEFAULT_TASK_NAME, true);
+                        time_remaining_timer.Enabled = true;
                     }
                     catch (NoTimerExists)
                     {
@@ -198,6 +198,56 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Updates the shutdown timer both locally and in the save file while also modifying the scheduled task.
+        /// </summary>
+        /// <param name="numSeconds">The number of seconds from the method call that the computer will be set to shutdown.</param>
+        private void AddTime(int numSeconds)
+        {
+            _shutdownTime = _shutdownTime.AddSeconds(numSeconds);
+            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
+            Properties.Settings.Default.Save();
+
+            ModifyShutdownTimer(numSeconds);
+        }
+
+        /// <summary>
+        /// Checks to see if a timer currently exists in the Task Scheduler.
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <returns>Returns true if a task with the parameter name is found.</returns>
+        public bool TimerExists(string taskName)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                Task task = ts.GetTask(DEFAULT_TASK_NAME);
+
+                if (task == null)
+                    return false;
+                else
+                    return true;
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified timer is running.
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <param name="currentTime">The current local time.</param>
+        /// <returns>Returns true if a task with the parameter name is found and running.</returns>
+        public bool TimerRunning(string taskName, DateTime currentTime)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                Task task = ts.GetTask(taskName);
+
+                if (task != null && task.NextRunTime != null && task.Name == taskName && task.NextRunTime > currentTime)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Computes the remaining time before the computer is set to shutdown.
         /// </summary>
         /// <returns></returns>
@@ -212,32 +262,64 @@ namespace WindowsShutdownTimer
                 return _shutdownTime.Subtract(_currentTime);
         }
 
-        private bool TimerExists(string taskName)
+        /// <summary>
+        /// Gets the timer for the running scheduled task.
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <param name="onlyCheckRunning">If true, this will only return a timer's DateTime if it is currently running. Otherwise a 'NoTimerExists' exception is raised.</param>
+        /// <returns>Returns the DateTime of when the scheduled event is set to fire.</returns>
+        public DateTime GetRunningTimer(string taskName, bool onlyCheckRunning)
         {
             using (TaskService ts = new TaskService())
             {
-                Task task = ts.GetTask(DEFAULT_TASK_NAME);
+                // If the task exists, return the trigger time.
+                if (TimerExists(taskName))
+                {
+                    if (onlyCheckRunning)
+                    {
+                        if (!TimerRunning(taskName, _currentTime))
+                            throw new NoTimerExists("The timer doesn't exist in the task schduler");
+                    }
 
-                if (task == null)
-                    return false;
+                    Task task = ts.GetTask(taskName);
+                    return task.Definition.Triggers.FirstOrDefault().StartBoundary;
+                }
+
                 else
-                    return true;
+                    throw new NoTimerExists("The timer doesn't exist in the task scheduler.");
             }
         }
 
-        private bool TimerRunning(string taskName)
+        /// <summary>
+        /// Gets the last time a scheduled task was run (successfully or not).
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <returns>Returns the DateTime of when the scheduled even last fired.</returns>
+        public DateTime GetLastRunTime(string taskName)
         {
             using (TaskService ts = new TaskService())
             {
-                Task task = ts.GetTask(taskName);
+                // If the task exists, return the last run time.
+                if (TimerExists(taskName))
+                {
+                    Task task = ts.GetTask(taskName);
 
-                if (task.Name == taskName && task.NextRunTime != null && task.NextRunTime > _currentTime)
-                    return true;
+                    return task.LastRunTime;
+                }
+
                 else
-                    return false;
+                    throw new NoTimerExists("The timer doesn't exist in the task scheduler.");
             }
         }
 
+        /// <summary>
+        /// Creates a scheduled task to shutdown the computer.
+        /// </summary>
+        /// <param name="numSeconds">The number of seconds from the method call that the computer will be set to shutdown.</param>
+        /// <remarks>This should only be called when creating a NEW scheduled event. It will throw a TimerExists exception if you attempt 
+        /// to recreate an existing timer.</remarks>
+        /// <exception cref="TimerExists()">Timer already exists. Use ModifyShutdownTimer instead of this method to make changes to 
+        /// that timer. Otherwise, remove it and call this method again.</exception>
         private void CreateShutdownTimer(int numSeconds)
         {
             using (TaskService ts = new TaskService())
@@ -278,33 +360,11 @@ namespace WindowsShutdownTimer
             }
         }
 
-        private void StopShutdownTimer()
-        {
-            using (TaskService ts = new TaskService())
-            {
-                // If the task exists, stop the trigger.
-                if (TimerExists(DEFAULT_TASK_NAME))
-                {
-                    Task task = ts.GetTask(DEFAULT_TASK_NAME);
-                    //task.Stop();
-                    //task.Enabled = false;
-                    task.Definition.Triggers.RemoveAt(0);
-                    task.RegisterChanges();
-
-                    ResetTimers();
-
-                    time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
-                    time_remaining_timer.Enabled = false;
-
-                    DisableModifyTimerButtons();
-                    DisableStopTimerButtons();
-                }
-
-                else
-                    throw new NoTimerExists("The timer doesn't exist in the task scheduler. You must create it instead of attempting to modify it!");
-            }
-        }
-
+        /// <summary>
+        /// Modifies an existing scheduled task. This should be used if only a single scheduled task will be used.
+        /// </summary>
+        /// <param name="numSeconds">The number of seconds from the method call that the computer will be set to shutdown.</param>
+        /// <remarks>This should be used instead of CreateShutdownTimer when there already exists a shutdown timer.</remarks>
         private void ModifyShutdownTimer(int numSeconds)
         {
             using (TaskService ts = new TaskService())
@@ -319,7 +379,7 @@ namespace WindowsShutdownTimer
 
                     else if (task.Definition.Triggers.Count > 1)
                     {
-                        for(int index = 0; index < task.Definition.Triggers.Count - 1; index++)
+                        for (int index = 0; index < task.Definition.Triggers.Count - 1; index++)
                         {
                             task.Definition.Triggers.RemoveAt(index);
                         }
@@ -343,34 +403,31 @@ namespace WindowsShutdownTimer
             }
         }
 
-        private void AddTime(int numSeconds)
-        {
-            _shutdownTime = _shutdownTime.AddSeconds(numSeconds);
-            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-            Properties.Settings.Default.Save();
-
-            ModifyShutdownTimer(numSeconds);
-        }
-
-        private DateTime GetPreviousTimer(string taskName, bool onlyCheckRunning)
+        /// <summary>
+        /// Stops the scheduled task by removing the trigger.
+        /// </summary>
+        private void StopShutdownTimer()
         {
             using (TaskService ts = new TaskService())
             {
-                // If the task exists, update the trigger.
-                if (TimerExists(taskName))
+                // If the task exists, remove the trigger. Note: the Stop() method doesn't work for some reason.
+                if (TimerExists(DEFAULT_TASK_NAME))
                 {
-                    if(onlyCheckRunning)
-                    {
-                        if (!TimerRunning(taskName))
-                            throw new NoTimerExists("The timer doesn't exist in the task schduler");
-                    }
+                    Task task = ts.GetTask(DEFAULT_TASK_NAME);
+                    task.Definition.Triggers.RemoveAt(0);
+                    task.RegisterChanges();
 
-                    Task task = ts.GetTask(taskName);
-                    return task.Definition.Triggers.FirstOrDefault().StartBoundary;
+                    ResetTimers();
+
+                    time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
+                    time_remaining_timer.Enabled = false;
+
+                    DisableModifyTimerButtons();
+                    DisableStopTimerButtons();
                 }
 
                 else
-                    throw new NoTimerExists("The timer doesn't exist in the task scheduler.");
+                    throw new NoTimerExists("The timer doesn't exist in the task scheduler. You must create it instead of attempting to modify it!");
             }
         }
 
@@ -416,7 +473,7 @@ namespace WindowsShutdownTimer
                 try
                 {
                     // There is an existing Shutdown and it is running and the user has entered a new shutdown time.
-                    if (timerExists && TimerRunning(DEFAULT_TASK_NAME) && numMinutes != 0)
+                    if (timerExists && TimerRunning(DEFAULT_TASK_NAME, _currentTime) && numMinutes != 0)
                     {
                         /// TODO: Add my own custom dialog box to customize the options so they aren't confusing.
                         DialogResult result = MessageBox.Show("A timer to shutdown Windows already exists. Would you like to stop that timer and add yours for "
