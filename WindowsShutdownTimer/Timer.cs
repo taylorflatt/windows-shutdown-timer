@@ -542,17 +542,18 @@ namespace WindowsShutdownTimer
                 if (Properties.Settings.Default.MinimizeToSysTray)
                 {
                     this.ShowInTaskbar = false;
+                    this.Visible = false;
                     // If this is windows 7, there is a small problem of it not fully minimizing the first time.
                     // Need to simply hide the window as well or it will show a small version right above the taskbar.
                     if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
-                        Hide();
+                        this.Visible = false;
                 }
                 else
                     this.ShowInTaskbar = true;
             }
 
             else
-                Show();
+                this.Visible = true;
         }
 
         /// <summary>
@@ -563,7 +564,7 @@ namespace WindowsShutdownTimer
         private void notifyIcon_DoubleClick(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Normal;
-            Show();
+            this.Visible = true;
         }
 
         /// <summary>
@@ -574,7 +575,7 @@ namespace WindowsShutdownTimer
         private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Normal;
-            Show();
+            this.Visible = true;
         }
 
         /// <summary>
@@ -585,7 +586,7 @@ namespace WindowsShutdownTimer
         private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Normal;
-            Show();
+            this.Visible = true;
         }
 
         /// <summary>
@@ -600,7 +601,7 @@ namespace WindowsShutdownTimer
             if (Properties.Settings.Default.LClickOpenSysTray && e.Button == MouseButtons.Left)
             {
                 WindowState = FormWindowState.Normal;
-                Show();
+                this.Visible = true;
             }
         }
 
