@@ -45,7 +45,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void Options_Load(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.MinimizePref)
+            if (Properties.Settings.Default.MinimizeToSysTray)
                 minimize_to_sys_tray.Checked = true;
             else
                 minimize_to_sys_tray.Checked = false;
@@ -65,9 +65,9 @@ namespace WindowsShutdownTimer
         { 
             // Minimize program to system tray rather than to the taskbar.
             if (minimize_to_sys_tray.Checked)
-                Properties.Settings.Default.MinimizePref = true;
+                Properties.Settings.Default.MinimizeToSysTray = true;
             else
-                Properties.Settings.Default.MinimizePref = false;
+                Properties.Settings.Default.MinimizeToSysTray = false;
             
             // Single left click to re-show program when clicking icon in system tray.
             if (left_click_open_sys_tray.Checked)
