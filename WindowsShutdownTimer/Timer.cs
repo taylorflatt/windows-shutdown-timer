@@ -164,6 +164,7 @@ namespace WindowsShutdownTimer
         /// </summary>
         private void RestoreForm()
         {
+            Show();
             this.WindowState = FormWindowState.Normal;
             this.Visible = true;
         }
@@ -688,19 +689,20 @@ namespace WindowsShutdownTimer
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
+                Hide();
                 ApplyUserSettings();
 
-                if (Properties.Settings.Default.MinimizeToSysTray)
-                {
-                    this.ShowInTaskbar = false;
-                    //this.Visible = false;
-                    // If this is windows 7, there is a small problem of it not fully minimizing the first time.
-                    // Need to simply hide the window as well or it will show a small version right above the taskbar.
-                    if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
-                        this.Visible = false;
-                }
-                else
-                    this.ShowInTaskbar = true;
+                //if (Properties.Settings.Default.MinimizeToSysTray)
+                //{
+                //    this.ShowInTaskbar = false;
+                //    //this.Visible = false;
+                //    // If this is windows 7, there is a small problem of it not fully minimizing the first time.
+                //    // Need to simply hide the window as well or it will show a small version right above the taskbar.
+                //    if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
+                //        this.Visible = false;
+                //}
+                //else
+                //    this.ShowInTaskbar = true;
             }
 
             else
