@@ -3,8 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 /// TODO: Need a cleaner option to handle all the switching for button toggling. Not sure if there really is a nicer option.
+/// 
+/// TODO: Find a way to keep user settings across different instances (i.e. open two different .exes which are the same version 
+/// but in different locations...currently that will create/store info in two difference files).
 /// 
 /// TODO: Add scheduler ability to shutdown computer everyday at a certain time. Basically add a scheduled event rather than 
 /// command line.
@@ -19,6 +23,12 @@ namespace WindowsShutdownTimer
 {
     public partial class TimerForm : Form
     {
+
+        private void DetectShutdown(object sender, SessionEndedEventArgs e)
+        {
+
+        }
+
         #region Main
         /// <summary>
         /// Tracks the current time and the projected shutdown time. Used for calculating remaining time to display to the user.
@@ -32,6 +42,9 @@ namespace WindowsShutdownTimer
         public TimerForm()
         { 
             InitializeComponent();
+
+            // Need to make sure to detach the listener when the form closes to prevent memory leak.
+            SystemEvents.SessionEnded += new SessionEndedEventHandler(DetectShutdown);
 
             this.Name = "Shutdown Windows Timer";
             this.Text = "Shutdown Windows Timer";
@@ -149,9 +162,10 @@ namespace WindowsShutdownTimer
         /// <summary>
         /// Applies the user's settings.
         /// </summary>
+        /// <remarks>Should probably rename this to SetMinimizePref or something more accurate.</remarks>
         public void ApplyUserSettings()
         {
-            if (Properties.Settings.Default.MinimizePref)
+            if (Properties.Settings.Default.MinimizeToSysTray)
                 notifyIcon.Visible = true;
 
             else
@@ -524,8 +538,17 @@ namespace WindowsShutdownTimer
             {
                 ApplyUserSettings();
 
-                if (Properties.Settings.Default.MinimizePref)
+                if (Properties.Settings.Default.MinimizeToSysTray)
+                {
                     this.ShowInTaskbar = false;
+
+                    // WindowState = FormWindowState.Minimized;
+
+                    // If this is windows 7, there is a small problem of it not fully minimizing the first time.
+                    // Need to simply hide the window as well or it will show a small version right above the taskbar.
+                    if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
+                        this.Visible = false;
+                }
                 else
                     this.ShowInTaskbar = true;
             }
@@ -575,6 +598,17 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Initiates an update by calling another action. Used from the main menu rather than the options form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options tempOptions = new Options(new TimerForm());
+            tempOptions.check_update_button_Click(null, null);
+        }
+
+        /// <summary>
         /// The options button in the menu that when clicked will create an options instance.
         /// </summary>
         /// <param name="sender"></param>
@@ -607,17 +641,21 @@ namespace WindowsShutdownTimer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        /// <summary>
+        /// Exits the program.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
         #endregion
-
-        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Options tempOptions = new Options(new TimerForm());
-            tempOptions.check_update_button_Click(null, null);
-        }
     }
 }
