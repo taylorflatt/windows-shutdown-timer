@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
-/// TODO: Need a cleaner option to handle all the switching for button toggling. Not sure if there really is a nicer option.
-/// 
+///
 /// TODO: Find a way to keep user settings across different instances (i.e. open two different .exes which are the same version 
 /// but in different locations...currently that will create/store info in two difference files).
 /// 
 /// TODO: Add scheduler ability to shutdown computer everyday at a certain time. Basically add a scheduled event rather than 
-/// command line.
-/// 
-/// TODO: Add the ability to turn off options saving so no files will be stored on the local computer. Not sure the best approach 
-/// to this other than not doing any sort of setting set prior to an initial change. That will add some additional overhead inline 
-/// since I will need to store local versions of the default variables and check if settings have been enabled and switch over at that 
-/// point. Not sure if it is really worth it to be honest.
-///
+/// command line. This might honestly be outside the scope of this program. But then again, a scheduled shutdown time isn't 
+/// really that obtuse.
 /// 
 
 namespace WindowsShutdownTimer
@@ -44,6 +36,8 @@ namespace WindowsShutdownTimer
             {
                 InitializeComponent();
 
+                this.CenterToScreen();
+
                 this.Name = "Windows Shutdown Timer";
                 this.Text = "Windows Shutdown Timer";
                 this.notifyIcon.Text = "Windows Shutdown Timer";
@@ -53,7 +47,7 @@ namespace WindowsShutdownTimer
                 submit_Button.Enabled = false;
                 description_label.AutoSize = true;
                 description_label.MaximumSize = new System.Drawing.Size(325, 0);
-                description_label.Text = "Enter the number minutes from now that you would like to shut down Windows (e.g. 5 for 5 minutes from now).";
+                description_label.Text = "Enter the number minutes from now that you would like to shut down Windows (e.g. Enter the number 5 for 5 minutes from now).";
 
                 SetCurrentTime();
 
@@ -362,6 +356,8 @@ namespace WindowsShutdownTimer
 
                     if (confirm == DialogResult.No)
                         return;
+                    else
+                        StartShutdownTimer(3);      // Added 3 seconds so it has enough time to save the data for the shutdown.
                 }
 
                 int timeInSeconds = numMinutes * 60;

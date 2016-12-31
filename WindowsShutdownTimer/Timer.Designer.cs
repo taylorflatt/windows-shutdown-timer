@@ -344,6 +344,7 @@
             this.MainMenuStrip = this.main_menu;
             this.MaximizeBox = false;
             this.Name = "TimerForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Shutdown Windows";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TimerForm_FormClosing);
             this.Resize += new System.EventHandler(this.TimerForm_Resize);

@@ -21,6 +21,9 @@ namespace WindowsShutdownTimer
             timerWindow = parent;
             timerWindow.Enabled = false;
 
+            // Setting this in the design menu doesn't work. Must be set here.
+            this.CenterToParent();
+
             last_shutdown_label_desc.Text = "Last Shutdown: ";
 
             // Because the settings manager won't store a 0001 default DateTime year.
