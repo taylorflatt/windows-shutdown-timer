@@ -36,6 +36,8 @@ namespace WindowsShutdownTimer
         public DateTime _currentTime;
         public DateTime _shutdownTime;
 
+        private const string DEFAULT_TIMER_DISPLAY = "0 days 0 hr 0 min 0 sec";
+
         /// <summary>
         /// Sets the initial program parameters.
         /// </summary>
@@ -50,6 +52,8 @@ namespace WindowsShutdownTimer
             this.Text = "Windows Shutdown Timer";
             this.notifyIcon.Text = "Windows Shutdown Timer";
 
+            this.AcceptButton = this.submit_Button;
+
             submit_Button.Enabled = false;
             description_label.AutoSize = true;
             description_label.MaximumSize = new System.Drawing.Size(325, 0);
@@ -62,7 +66,7 @@ namespace WindowsShutdownTimer
             time_remaining_timer.Enabled = false;   // Enable the tracking timer.
             time_remaining_timer.Interval = 1000;   // Check time remaining every 1 seconds.
             time_remaining_desc_label.Text = "Time Remaining: ";
-            time_remaining_label.Text = "0 hr 0 min 0 sec";
+            time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
 
             EnableStopTimerButtons();       // Decided to always have this enabled in case they want to stop another timer not created by this program. No real harm.
             DisableModifyTimerButtons();    // Immediately disable this the add time option and re-enable later when necessary.
@@ -86,15 +90,14 @@ namespace WindowsShutdownTimer
             /// TODO: Could mute the sound for the notification (possibly) to help mitigate some of the annoyance.
             if (Properties.Settings.Default.ShutdownTimer > _currentTime)
             {
-                SetCurrentTime();   // Update the current time.
+                SetCurrentTime();                                                           // Update the current time.
                 var timeRemaining = Properties.Settings.Default.ShutdownTimer.Subtract(_currentTime);
 
-                // Make sure the timer wasn't stopped manually.
-                if (ShutdownTimerExists())
+                if (ShutdownTimerExists())                                                  // Make sure the timer wasn't stopped manually.
                 {
-                    StopShutdownTimer(false);
-                    StartShutdownTimer(timeRemaining.Minutes);
-                    createTimerToolStripMenuItem.Enabled = false;
+                    StopShutdownTimer(false);                                               // Since there is already a timer, stop it.
+                    StartShutdownTimer(Convert.ToInt32(timeRemaining.TotalMinutes));        // Recreate the timer so the display can be accurate.
+                    createTimerToolStripMenuItem.Enabled = false;                           // Shut off the create timer option.
                 }
             }
         }
@@ -286,7 +289,7 @@ namespace WindowsShutdownTimer
                     ResetTimers();
 
                     // Reset the remaining time label.
-                    time_remaining_label.Text = Convert.ToString(TimeSpan.Zero);
+                    time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
 
                     // Disable the timer.
                     time_remaining_timer.Enabled = false;
@@ -302,7 +305,7 @@ namespace WindowsShutdownTimer
         /// This should always be called prior to making a call to StopShutdownTimer since that method assumes a complete stoppage (whether 
         /// </summary>
         /// <returns>Returns whether or not a shutdown timer has been initiated by any program.</returns>
-        private bool ShutdownTimerExists(int numMinutes = 500000, bool stopOtherTimer = false)
+        private bool ShutdownTimerExists(int numMinutes = 50000, bool stopOtherTimer = false)
         {
             SetCurrentTime();
 
@@ -404,11 +407,11 @@ namespace WindowsShutdownTimer
         {
             try
             {
-                time_remaining_label.Text = TimeRemaining().ToString("hh' hr 'mm' min 'ss' sec'");
+                time_remaining_label.Text = TimeRemaining().ToString("dd' days 'hh' hr 'mm' min 'ss' sec'");
             }
             catch(TimerEnded)
             {
-                time_remaining_label.Text = "0 hr 0 min 0 sec";
+                time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
                 time_remaining_timer.Enabled = false;
             }
             catch(FormatException)
