@@ -542,15 +542,17 @@ namespace WindowsShutdownTimer
                 if (Properties.Settings.Default.MinimizeToSysTray)
                 {
                     this.ShowInTaskbar = false;
-
                     // If this is windows 7, there is a small problem of it not fully minimizing the first time.
                     // Need to simply hide the window as well or it will show a small version right above the taskbar.
                     if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
-                        WindowState = FormWindowState.Minimized;
+                        Hide();
                 }
                 else
                     this.ShowInTaskbar = true;
             }
+
+            else
+                Show();
         }
 
         /// <summary>
