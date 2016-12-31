@@ -563,6 +563,7 @@ namespace WindowsShutdownTimer
         private void notifyIcon_DoubleClick(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Normal;
+            Show();
         }
 
         /// <summary>
@@ -573,6 +574,7 @@ namespace WindowsShutdownTimer
         private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Normal;
+            Show();
         }
 
         /// <summary>
@@ -583,6 +585,7 @@ namespace WindowsShutdownTimer
         private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Normal;
+            Show();
         }
 
         /// <summary>
@@ -595,7 +598,10 @@ namespace WindowsShutdownTimer
         {
             // Only re-show the app if the user has selected it and they are left clicking (not right clicking).
             if (Properties.Settings.Default.LClickOpenSysTray && e.Button == MouseButtons.Left)
+            {
                 WindowState = FormWindowState.Normal;
+                Show();
+            }
         }
 
         /// <summary>
