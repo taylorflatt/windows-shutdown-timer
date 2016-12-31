@@ -276,7 +276,7 @@
             this.stopTimerContextToolStripMenuItem,
             this.exitToolStripMenuItem1});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(158, 158);
+            this.contextMenuStrip.Size = new System.Drawing.Size(158, 136);
             // 
             // showTimerToolStripMenuItem
             // 
@@ -336,6 +336,7 @@
             this.MaximizeBox = false;
             this.Name = "TimerForm";
             this.Text = "Shutdown Windows";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TimerForm_FormClosing);
             this.Resize += new System.EventHandler(this.TimerForm_Resize);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
