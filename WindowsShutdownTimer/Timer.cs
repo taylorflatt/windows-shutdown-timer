@@ -199,7 +199,7 @@ namespace WindowsShutdownTimer
             SetCurrentTime();   // Important to update to the current time.
 
             if (_shutdownTime <= _currentTime)
-                return new TimeSpan(0,0,0,0,0);
+                throw new TimerEnded("The timer has ended successfully. However, you shouldn't be seeing this message. ");
 
             else
                 return _shutdownTime.Subtract(_currentTime);
@@ -404,16 +404,12 @@ namespace WindowsShutdownTimer
         {
             try
             {
-                TimeSpan time = TimeRemaining();
-
-                if(time != new TimeSpan(0,0,0,0,0))
-                    // do something
-
-                // If there is time remaining, display it. Otherwise, show that the timer has ended.
-                if(time.Seconds != 0 && time.Minutes != 0 && time.Hours != 0 && time.Days != 0)
-                    time_remaining_label.Text = TimeRemaining().ToString("hh' hr 'mm' min 'ss' sec'");
-                else
-                    time_remaining_label.Text = "0 hr 0 min 0 sec";
+                time_remaining_label.Text = TimeRemaining().ToString("hh' hr 'mm' min 'ss' sec'");
+            }
+            catch(TimerEnded)
+            {
+                time_remaining_label.Text = "0 hr 0 min 0 sec";
+                time_remaining_timer.Enabled = false;
             }
             catch(FormatException)
             {
