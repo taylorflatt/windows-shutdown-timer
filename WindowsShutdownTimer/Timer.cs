@@ -24,12 +24,6 @@ namespace WindowsShutdownTimer
 {
     public partial class TimerForm : Form
     {
-
-        private void DetectShutdown(object sender, SessionEndedEventArgs e)
-        {
-
-        }
-
         #region Main
         /// <summary>
         /// Tracks the current time and the projected shutdown time. Used for calculating remaining time to display to the user.
@@ -49,9 +43,6 @@ namespace WindowsShutdownTimer
             if(!programRunning)
             {
                 InitializeComponent();
-
-                // Need to make sure to detach the listener when the form closes to prevent memory leak.
-                SystemEvents.SessionEnded += new SessionEndedEventHandler(DetectShutdown);
 
                 this.Name = "Windows Shutdown Timer";
                 this.Text = "Windows Shutdown Timer";
@@ -355,11 +346,22 @@ namespace WindowsShutdownTimer
         {
             if(int.TryParse(MinutesTextBox.Text, out int numMinutes))
             {
-                // Handle only 
+                // The number was able to be parsed but turned out too large.
                 if (numMinutes > 5255999)
                 {
-                    MessageBox.Show("You can't set a timer for longer than 10 years (5255999 minutes). Anything longer is currently not supported.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("You can't set a timer for longer than 10 years (5255999 minutes). Anything longer is currently not " +
+                        "supported.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
+                }
+
+                // Make sure they want to actually shut down right now.
+                else if(numMinutes == 0)
+                {
+                    DialogResult confirm = MessageBox.Show("You entered 0 minutes, this means the computer will shutdown IMMEDIATELY. " +
+                        "Are you sure?", "Warning - Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+
+                    if (confirm == DialogResult.No)
+                        return;
                 }
 
                 int timeInSeconds = numMinutes * 60;
