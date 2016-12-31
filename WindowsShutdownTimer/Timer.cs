@@ -166,7 +166,6 @@ namespace WindowsShutdownTimer
         {
             this.WindowState = FormWindowState.Normal;
             this.Visible = true;
-            this.Enabled = true;
         }
 
         /// <summary>
@@ -705,7 +704,7 @@ namespace WindowsShutdownTimer
             }
 
             else
-                this.Visible = true;
+                RestoreForm();
         }
 
         /// <summary>
@@ -746,12 +745,9 @@ namespace WindowsShutdownTimer
         /// <remarks>This depends completely on user settings and will not fire unless the user has selected the option in the options form.</remarks>
         private void notifyIcon_Click(object sender, MouseEventArgs e)
         {
-            var test = "Button Pressed: " + e.Button;
             // Only re-show the app if the user has selected it and they are left clicking (not right clicking).
             if (Properties.Settings.Default.LClickOpenSysTray && e.Button == MouseButtons.Left)
-            {
                 RestoreForm();
-            }
         }
 
         /// <summary>
