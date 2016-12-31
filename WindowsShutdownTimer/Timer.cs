@@ -46,8 +46,9 @@ namespace WindowsShutdownTimer
             // Need to make sure to detach the listener when the form closes to prevent memory leak.
             SystemEvents.SessionEnded += new SessionEndedEventHandler(DetectShutdown);
 
-            this.Name = "Shutdown Windows Timer";
-            this.Text = "Shutdown Windows Timer";
+            this.Name = "Windows Shutdown Timer";
+            this.Text = "Windows Shutdown Timer";
+            this.notifyIcon.Text = "Windows Shutdown Timer";
 
             submit_Button.Enabled = false;
             description_label.AutoSize = true;
@@ -541,8 +542,6 @@ namespace WindowsShutdownTimer
                 if (Properties.Settings.Default.MinimizeToSysTray)
                 {
                     this.ShowInTaskbar = false;
-
-                    // 
 
                     // If this is windows 7, there is a small problem of it not fully minimizing the first time.
                     // Need to simply hide the window as well or it will show a small version right above the taskbar.
