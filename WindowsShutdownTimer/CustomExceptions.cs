@@ -75,4 +75,20 @@ namespace WindowsShutdownTimer
 
         public TimerEnded(string message) : base(message) { }
     }
+
+    [Serializable]
+    class TimerExists : Exception
+    {
+        public TimerExists() { }
+
+        public TimerExists(string message) : base(message) { }
+    }
+
+    [Serializable]
+    class NoTimerExists : Exception
+    {
+        public NoTimerExists() { }
+
+        public NoTimerExists(string message) : base(message) { }
+    }
 }
