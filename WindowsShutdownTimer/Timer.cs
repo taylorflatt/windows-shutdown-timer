@@ -85,7 +85,11 @@ namespace WindowsShutdownTimer
                     try
                     {
                         _shutdownTime = GetRunningTimer(DEFAULT_TASK_NAME, true);
+
+                        EnableModifyTimerButtons();
+
                         time_remaining_timer.Enabled = true;
+                        createTimerToolStripMenuItem.Enabled = false;
                     }
                     catch (NoTimerExists)
                     {
@@ -153,6 +157,16 @@ namespace WindowsShutdownTimer
         {
             _currentTime = SetDefaultDateTime(_currentTime);
             _shutdownTime = SetDefaultDateTime(_shutdownTime);
+        }
+
+        /// <summary>
+        /// Restores the form after a minimization.
+        /// </summary>
+        private void RestoreForm()
+        {
+            this.WindowState = FormWindowState.Normal;
+            this.Visible = true;
+            this.Enabled = true;
         }
 
         /// <summary>
@@ -346,6 +360,7 @@ namespace WindowsShutdownTimer
 
                         EnableStopTimerButtons();
                         EnableModifyTimerButtons();
+                        createTimerToolStripMenuItem.Enabled = false;
 
                         time_remaining_timer.Enabled = true;
                     }
@@ -672,14 +687,14 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void TimerForm_Resize(object sender, EventArgs e)
         {
-            if (WindowState == FormWindowState.Minimized)
+            if (this.WindowState == FormWindowState.Minimized)
             {
                 ApplyUserSettings();
 
                 if (Properties.Settings.Default.MinimizeToSysTray)
                 {
                     this.ShowInTaskbar = false;
-                    this.Visible = false;
+                    //this.Visible = false;
                     // If this is windows 7, there is a small problem of it not fully minimizing the first time.
                     // Need to simply hide the window as well or it will show a small version right above the taskbar.
                     if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
@@ -700,8 +715,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void notifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
-            this.Visible = true;
+            RestoreForm();
         }
 
         /// <summary>
@@ -711,8 +725,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
-            this.Visible = true;
+            RestoreForm();
         }
 
         /// <summary>
@@ -722,8 +735,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
-            this.Visible = true;
+            RestoreForm();
         }
 
         /// <summary>
@@ -734,11 +746,11 @@ namespace WindowsShutdownTimer
         /// <remarks>This depends completely on user settings and will not fire unless the user has selected the option in the options form.</remarks>
         private void notifyIcon_Click(object sender, MouseEventArgs e)
         {
+            var test = "Button Pressed: " + e.Button;
             // Only re-show the app if the user has selected it and they are left clicking (not right clicking).
             if (Properties.Settings.Default.LClickOpenSysTray && e.Button == MouseButtons.Left)
             {
-                WindowState = FormWindowState.Normal;
-                this.Visible = true;
+                RestoreForm();
             }
         }
 
@@ -792,6 +804,18 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Called after any form closing event. Save the user's settings in the event they have been deleted.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // In case the settings are deleted before the program exits, save the user's settings prior to exiting.
+            // Adds a bit of overhead but I think it is worth it.
+            Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
         /// Exits the program.
         /// </summary>
         /// <param name="sender"></param>
@@ -809,18 +833,6 @@ namespace WindowsShutdownTimer
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        /// <summary>
-        /// Called after any form closing event. Save the user's settings in the event they have been deleted.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TimerForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            // In case the settings are deleted before the program exits, save the user's settings prior to exiting.
-            // Adds a bit of overhead but I think it is worth it.
-            Properties.Settings.Default.Save();
         }
 
         #endregion
