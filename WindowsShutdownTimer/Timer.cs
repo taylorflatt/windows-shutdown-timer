@@ -198,7 +198,7 @@ namespace WindowsShutdownTimer
         {
             SetCurrentTime();   // Important to update to the current time.
 
-            if (_shutdownTime > _currentTime)
+            if (_shutdownTime <= _currentTime)
                 return new TimeSpan(0,0,0,0,0);
 
             else
