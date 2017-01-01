@@ -52,23 +52,26 @@ namespace WindowsShutdownTimer
     class TimerEnded : Exception
     {
         public TimerEnded() { }
-
         public TimerEnded(string message) : base(message) { }
     }
 
+    /// <summary>
+    /// Timer exists in the scheduler.
+    /// </summary>
     [Serializable]
     class TimerExists : Exception
     {
         public TimerExists() { }
-
         public TimerExists(string message) : base(message) { }
     }
 
+    /// <summary>
+    /// Timer doesn't exist in the scheduler.
+    /// </summary>
     [Serializable]
     class NoTimerExists : Exception
     {
         public NoTimerExists() { }
-
         public NoTimerExists(string message) : base(message) { }
     }
 }
