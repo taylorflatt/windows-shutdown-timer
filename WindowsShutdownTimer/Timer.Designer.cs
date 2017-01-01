@@ -62,6 +62,7 @@
             this.shutdownNowToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.stopTimerContextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.verify_time_remaining_timer = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.main_menu.SuspendLayout();
             this.contextMenuStrip.SuspendLayout();
@@ -329,6 +330,10 @@
             this.exitToolStripMenuItem1.Text = "Exit";
             this.exitToolStripMenuItem1.Click += new System.EventHandler(this.exitToolStripMenuItem1_Click);
             // 
+            // verify_time_remaining_timer
+            // 
+            this.verify_time_remaining_timer.Tick += new System.EventHandler(this.verify_time_remaining_timer_Tick);
+            // 
             // TimerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -392,6 +397,7 @@
         private System.Windows.Forms.ToolStripMenuItem shutdownNowToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem bugReportToolStripMenuItem;
+        private System.Windows.Forms.Timer verify_time_remaining_timer;
     }
 }
 
