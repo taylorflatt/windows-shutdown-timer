@@ -7,7 +7,7 @@ Creates timer that will shutdown windows after a specified number of minutes. It
 
 ## Requirements
 
-* Windows 10, Windows 8, Windows 7
+* Windows 10, Windows 8.1/8, Windows 7
 * [.NET Framework 4.5.2](https://www.microsoft.com/en-us/download/details.aspx?id=42642) or better
 
 ## Features
@@ -32,11 +32,7 @@ Otherwise, you can simply download the latest version from the [Release Section]
 
 ## Known Issues
 
-There aren't any program breaking issues as of yet. If you discover any, please don't hesitate to contact me or raise an issue. But I am aware of some annoyances and am working on finding solutions to those:
-
-* When the program first starts, if a timer was set by the program previously but has yet to elapse, a check will be run. The check will cause a shutdown notification and a "ding". It doesn't change anything other than simply verify the existence of a timer. I'm looking for ways around this small annoyance. It doesn't happen often though, which is nice.
-* When the computer is around 15 minutes or less from shutting off, a banner or dialog box on Windows 7, 8, and 10 will display indicating the impending shutdown. This is for any scheduled shutdown and I am looking at ways to remove/disable this function. There isn't an option to perform a quiet reboot like literally every other OS out there. 
-* After an update, settings are not preserved. This isn't game breaking but it is annoying. This is the next thing I plan on tackling.
+There are currently no known issues at this time. If you discover one, please submit a [bug report](https://github.com/taylorflatt/windows-shutdown-timer/issues).
 
 ## Notes
 
