@@ -26,7 +26,7 @@ namespace WindowsShutdownTimer
 
         public const string DEFAULT_TIMER_DISPLAY = "0 days 0 hr 0 min 0 sec";
         public const string DEFAULT_TASK_NAME = "ScheduledShutdownTimer";
-        private const string SHUTDOWN_COMMAND = "echo \"Hello!\" ";
+        private const string SHUTDOWN_COMMAND = "/s /c \"Scheduled Computer shutdown via the Windows Shutdown Timer App\" /t 1";
 
         /// <summary>
         /// Sets the initial program parameters.
@@ -94,7 +94,7 @@ namespace WindowsShutdownTimer
                     }
                     catch (NoTimerExists)
                     {
-                        StopLocalTimer(true);
+                        StopLocalTimer();
                     }
                     catch(Exception)
                     {
@@ -378,7 +378,7 @@ namespace WindowsShutdownTimer
                         td.Settings.Enabled = true;
 
                         td.Triggers.Add(new TimeTrigger(_shutdownTime));
-                        td.Actions.Add(new ExecAction("cmd.exe", SHUTDOWN_COMMAND + " seconds entered: " + numSeconds, null));
+                        td.Actions.Add(new ExecAction("shutdown", SHUTDOWN_COMMAND, null));
                         
                         TaskService.Instance.RootFolder.RegisterTaskDefinition(DEFAULT_TASK_NAME, td);
 
@@ -423,9 +423,25 @@ namespace WindowsShutdownTimer
                         }
                     }
 
-                    task.Definition.Settings.Enabled = true;    // Resets the status of the task to Ready in case it was modified.
+                    // Add the new trigger after making sure it is the only one.
                     task.Definition.Triggers.Add(new TimeTrigger(_shutdownTime));
 
+                    if (task.Definition.Actions.Count == 1)
+                        task.Definition.Actions.RemoveAt(0);
+
+                    else if (task.Definition.Actions.Count > 1)
+                    {
+                        for (int index = 0; index < task.Definition.Actions.Count - 1; index++)
+                        {
+                            task.Definition.Actions.RemoveAt(index);
+                        }
+                    }
+
+                    // Add the new action after making sure it is the only one.
+                    task.Definition.Actions.Add(new ExecAction("shutdown", SHUTDOWN_COMMAND, null));
+
+                    // Reset the status in case it was set as anything but "Ready"
+                    task.Definition.Settings.Enabled = true;
                     task.RegisterChanges();
 
                     Properties.Settings.Default.ShutdownTimer = _shutdownTime;
@@ -642,14 +658,14 @@ namespace WindowsShutdownTimer
             }
             catch(NoTimerExists)
             {
-                if (TimerDisabled(DEFAULT_TASK_NAME))
+                if (TimerExists(DEFAULT_TASK_NAME) && TimerDisabled(DEFAULT_TASK_NAME))
                     StopLocalTimer(true);
                 else
                     StopLocalTimer();
             }
             catch(TimerEnded)
             {
-                if (TimerDisabled(DEFAULT_TASK_NAME))
+                if (TimerExists(DEFAULT_TASK_NAME) && TimerDisabled(DEFAULT_TASK_NAME))
                     StopLocalTimer(true);
                 else
                     StopLocalTimer();
@@ -816,7 +832,6 @@ namespace WindowsShutdownTimer
         {
             RestoreForm();
             TimerForm_Resize(null, null);
-            
         }
 
         /// <summary>
