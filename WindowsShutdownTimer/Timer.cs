@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using Microsoft.Win32.TaskScheduler;
 
 ///
 /// TODO: Find a way to keep user settings across different instances (i.e. open two different .exes which are the same version 
@@ -10,7 +11,7 @@ using System.Windows.Forms;
 /// TODO: Add scheduler ability to shutdown computer everyday at a certain time. Basically add a scheduled event rather than 
 /// command line. This might honestly be outside the scope of this program. But then again, a scheduled shutdown time isn't 
 /// really that obtuse.
-/// 
+///  
 
 namespace WindowsShutdownTimer
 {
@@ -23,7 +24,9 @@ namespace WindowsShutdownTimer
         public DateTime _currentTime;
         public DateTime _shutdownTime;
 
-        private const string DEFAULT_TIMER_DISPLAY = "0 days 0 hr 0 min 0 sec";
+        public const string DEFAULT_TIMER_DISPLAY = "0 days 0 hr 0 min 0 sec";
+        public const string DEFAULT_TASK_NAME = "ScheduledShutdownTimer";
+        private const string SHUTDOWN_COMMAND = "/s /c \"Scheduled Computer shutdown via the Windows Shutdown Timer App\" /t 1";
 
         /// <summary>
         /// Sets the initial program parameters.
@@ -42,6 +45,12 @@ namespace WindowsShutdownTimer
                 this.Text = "Windows Shutdown Timer";
                 this.notifyIcon.Text = "Windows Shutdown Timer";
 
+                // Only set once so a reload of the application is required.
+                if (Properties.Settings.Default.MinimizeToSysTray)
+                    this.ShowInTaskbar = false;
+                else
+                    this.ShowInTaskbar = true;
+
                 this.AcceptButton = this.submit_Button;
 
                 submit_Button.Enabled = false;
@@ -49,17 +58,17 @@ namespace WindowsShutdownTimer
                 description_label.MaximumSize = new System.Drawing.Size(325, 0);
                 description_label.Text = "Enter the number minutes from now that you would like to shut down Windows (e.g. Enter the number 5 for 5 minutes from now).";
 
-                SetCurrentTime();
-
                 _shutdownTime = new DateTime();
 
-                time_remaining_timer.Enabled = false;   // Enable the tracking timer.
+                time_remaining_timer.Enabled = false;   // Disable the tracking timer.
                 time_remaining_timer.Interval = 1000;   // Check time remaining every 1 seconds.
-                time_remaining_desc_label.Text = "Time Remaining: ";
-                time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
 
-                EnableStopTimerButtons();       // Decided to always have this enabled in case they want to stop another timer not created by this program. No real harm.
-                DisableModifyTimerButtons();    // Immediately disable this the add time option and re-enable later when necessary.
+                verify_time_remaining_timer.Enabled = false;    // Disable the verify timer.
+                verify_time_remaining_timer.Interval = 15000;   // Check with scheduler's time every 15 seconds.
+                time_remaining_desc_label.Text = "Time Remaining: ";
+
+                StopLocalTimer();               // Default everything to 'off'.
+                UpdateCurrentTime();            // This must be called AFTER the StopLocalTimer() so it updates the _currentTime object rather than resetting it.
 
                 // If first run, then welcome the user and notify that they may remove the old program.
                 if (Properties.Settings.Default.FirstRun == true)
@@ -69,34 +78,29 @@ namespace WindowsShutdownTimer
                     Properties.Settings.Default.ShutdownTimer = SetDefaultDateTime(Properties.Settings.Default.ShutdownTimer);
                     Properties.Settings.Default.FirstRun = false;
                     Properties.Settings.Default.Save();
+
                     MessageBox.Show("This appears to be the first time running this program. If you are new, then Welcome! If you have updated from a previous version, then " +
                         "you may now safely remove the previous version of the program.", "Welcome to Windows Shutdown Timer!", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                // If the last shutdown time was scheduled after the current time then go ahead and redisplay it
-                // so the user can see it. I do a hard reset on the timer so this could result in a timer created 
-                // by SOMETHING ELSE being removed and this one superseding it.
+                var temp = "Stored Shutdown Time: " + Properties.Settings.Default.ShutdownTimer + " and the current time: " + _currentTime + " and is the programming running: " + programRunning;
+
                 if (Properties.Settings.Default.ShutdownTimer > _currentTime && !programRunning)
                 {
-                    SetCurrentTime();                                                               // Update the current time.
-                    var timeRemaining = Properties.Settings.Default.ShutdownTimer.Subtract(_currentTime);
-                    Console.WriteLine(timeRemaining);
-
                     try
                     {
-                        if (ShutdownTimerExists())                                                  // Make sure the timer wasn't stopped manually.
-                        {
-                            StopShutdownTimer(true);                                                // Since there is already a timer, stop it.
-                            StartShutdownTimer(Convert.ToInt32(timeRemaining.TotalSeconds));             // Recreate the timer so the display can be accurate.
-                            createTimerToolStripMenuItem.Enabled = false;                           // Shut off the create timer option.
-                        }
+                        _shutdownTime = GetRunningTimer(DEFAULT_TASK_NAME, true);
+                        StartLocalTimer();
                     }
-
-                    catch (CheckTimerException ex)
+                    catch (NoTimerExists)
+                    {
+                        StopLocalTimer();
+                    }
+                    catch(Exception)
                     {
                         DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
                             "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
-                            "select YES. Error Code: " + ex.ErrorCode, "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
+                            "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
 
                         if (report == DialogResult.Yes)
                             Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
@@ -157,6 +161,18 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Restores the form after a minimization.
+        /// </summary>
+        private void RestoreForm()
+        {
+            // If Windows 7.
+            if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
+                this.Visible = true;
+
+            this.WindowState = FormWindowState.Normal;
+        }
+
+        /// <summary>
         /// Fix the default date so that it will save in the user settings.
         /// </summary>
         /// <param name="obj"></param>
@@ -175,7 +191,10 @@ namespace WindowsShutdownTimer
         public void ApplyUserSettings()
         {
             if (Properties.Settings.Default.MinimizeToSysTray)
+            {
+                this.ShowInTaskbar = false;
                 notifyIcon.Visible = true;
+            }
 
             else
                 notifyIcon.Visible = false;
@@ -184,9 +203,9 @@ namespace WindowsShutdownTimer
         /// <summary>
         /// Gets the current time relative to the user's computer.
         /// </summary>
-        private void SetCurrentTime()
+        private void UpdateCurrentTime()
         {
-            _currentTime = DateTime.UtcNow;
+            _currentTime = DateTime.Now;
         }
 
         /// <summary>
@@ -199,12 +218,82 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Updates the shutdown timer both locally and in the save file while also modifying the scheduled task.
+        /// </summary>
+        /// <param name="numSeconds">The number of seconds from the method call that the computer will be set to shutdown.</param>
+        private void AddTime(int numSeconds)
+        {
+            _shutdownTime = _shutdownTime.AddSeconds(numSeconds);
+            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
+            Properties.Settings.Default.Save();
+
+            ModifyShutdownTimer(numSeconds);
+        }
+
+        /// <summary>
+        /// Checks to see if a timer currently exists in the Task Scheduler.
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <returns>Returns true if a task with the parameter name is found.</returns>
+        public bool TimerExists(string taskName)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                Task task = ts.GetTask(DEFAULT_TASK_NAME);
+
+                if (task == null)
+                    return false;
+                else
+                    return true;
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified timer is disabled.
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <returns>Returns true if a task with the parameter name is disabled.</returns>
+        public bool TimerDisabled(string taskName)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                Task task = ts.GetTask(taskName);
+
+                if (task == null || task.Name != taskName)
+                    throw new NoTimerExists();
+                else if (task.State == TaskState.Disabled ||
+                    task.State == TaskState.Unknown)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified timer is running.
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <param name="currentTime">The current local time.</param>
+        /// <returns>Returns true if a task with the parameter name is found and running.</returns>
+        public bool TimerRunning(string taskName, DateTime currentTime)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                Task task = ts.GetTask(taskName);
+                if (TimerExists(taskName) && !TimerDisabled(taskName) && task.NextRunTime != null && task.NextRunTime > currentTime)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Computes the remaining time before the computer is set to shutdown.
         /// </summary>
         /// <returns></returns>
         private TimeSpan TimeRemaining()
         {
-            SetCurrentTime();   // Important to update to the current time.
+            UpdateCurrentTime();   // Important to update to the current time.
 
             if (_shutdownTime <= _currentTime)
                 throw new TimerEnded("The timer has ended successfully. However, you shouldn't be seeing this message. ");
@@ -214,119 +303,213 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
-        /// Starts the shutdown timer.
+        /// Gets the timer for the running scheduled task.
         /// </summary>
-        /// <param name="numSeconds">The number of seconds (if any) from the current time that the shutdown will be set.</param>
-        private void StartShutdownTimer(int numSeconds)
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <param name="onlyCheckRunning">If true, this will only return a timer's DateTime if it is currently running. Otherwise a 'NoTimerExists' exception is raised.</param>
+        /// <returns>Returns the DateTime of when the scheduled event is set to fire.</returns>
+        public DateTime GetRunningTimer(string taskName, bool onlyCheckRunning)
         {
-            // Enable timer, stop timer button, and add time button.
-            time_remaining_timer.Enabled = true;
+            using (TaskService ts = new TaskService())
+            {
+                // If the task exists, return the trigger time.
+                if (TimerExists(taskName))
+                {
+                    if (onlyCheckRunning)
+                    {
+                        if (!TimerRunning(taskName, _currentTime))
+                            throw new NoTimerExists("The timer doesn't exist in the task schduler");
+                    }
+
+                    Task task = ts.GetTask(taskName);
+                    return task.Definition.Triggers.FirstOrDefault().StartBoundary;
+                }
+
+                else
+                    throw new NoTimerExists("The timer doesn't exist in the task scheduler.");
+            }
+        }
+
+        /// <summary>
+        /// Gets the last time a scheduled task was run (successfully or not).
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <returns>Returns the DateTime of when the scheduled even last fired.</returns>
+        public DateTime GetLastRunTime(string taskName)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                // If the task exists, return the last run time.
+                if (TimerExists(taskName))
+                {
+                    Task task = ts.GetTask(taskName);
+                    return task.LastRunTime;
+                }
+
+                else
+                    throw new NoTimerExists("The timer doesn't exist in the task scheduler.");
+            }
+        }
+
+        /// <summary>
+        /// Creates a scheduled task to shutdown the computer.
+        /// </summary>
+        /// <param name="numSeconds">The number of seconds from the method call that the computer will be set to shutdown.</param>
+        /// <remarks>This should only be called when creating a NEW scheduled event. It will throw a TimerExists exception if you attempt 
+        /// to recreate an existing timer.</remarks>
+        /// <exception cref="TimerExists()">Timer already exists. Use ModifyShutdownTimer instead of this method to make changes to 
+        /// that timer. Otherwise, remove it and call this method again.</exception>
+        private void CreateShutdownTimer(int numSeconds)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                // If the task doesn't exist, create it.
+                if (TimerExists(DEFAULT_TASK_NAME))
+                    throw new TimerExists("The timer already exists in the task scheduler. You must modify it instead of attempting to create it!");
+                else
+                {
+                    try
+                    {
+                        TaskDefinition td = ts.NewTask();
+                        td.RegistrationInfo.Date = _currentTime;
+                        td.RegistrationInfo.Source = "Windows Shutdown Timer";
+                        td.RegistrationInfo.Description = "Shutdown Timer initiated by Windows Shutdown Timer";
+
+                        td.Settings.Enabled = true;
+
+                        td.Triggers.Add(new TimeTrigger(_shutdownTime));
+                        td.Actions.Add(new ExecAction("shutdown", SHUTDOWN_COMMAND, null));
+                        
+                        TaskService.Instance.RootFolder.RegisterTaskDefinition(DEFAULT_TASK_NAME, td);
+
+                        Properties.Settings.Default.ShutdownTimer = _shutdownTime;
+                        Properties.Settings.Default.Save();
+
+                        StartLocalTimer();
+                    }
+                    catch(Exception)
+                    {
+                        DialogResult alert = MessageBox.Show("The timer couldn't be set. ", "Error - Couldn't Set Timer!", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+
+                        if (alert == DialogResult.Retry)
+                            CreateShutdownTimer(numSeconds);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Modifies an existing scheduled task. This should be used if only a single scheduled task will be used.
+        /// </summary>
+        /// <param name="numSeconds">The number of seconds from the method call that the computer will be set to shutdown.</param>
+        /// <remarks>This should be used instead of CreateShutdownTimer when there already exists a shutdown timer.</remarks>
+        private void ModifyShutdownTimer(int numSeconds)
+        {
+            using (TaskService ts = new TaskService())
+            {
+                // If the task exists, update the trigger.
+                if (TimerExists(DEFAULT_TASK_NAME))
+                {
+                    Task task = ts.GetTask(DEFAULT_TASK_NAME);
+
+                    if (task.Definition.Triggers.Count == 1)
+                        task.Definition.Triggers.RemoveAt(0);
+
+                    else if (task.Definition.Triggers.Count > 1)
+                    {
+                        for (int index = 0; index < task.Definition.Triggers.Count - 1; index++)
+                        {
+                            task.Definition.Triggers.RemoveAt(index);
+                        }
+                    }
+
+                    // Add the new trigger after making sure it is the only one.
+                    task.Definition.Triggers.Add(new TimeTrigger(_shutdownTime));
+
+                    if (task.Definition.Actions.Count == 1)
+                        task.Definition.Actions.RemoveAt(0);
+
+                    else if (task.Definition.Actions.Count > 1)
+                    {
+                        for (int index = 0; index < task.Definition.Actions.Count - 1; index++)
+                        {
+                            task.Definition.Actions.RemoveAt(index);
+                        }
+                    }
+
+                    // Add the new action after making sure it is the only one.
+                    task.Definition.Actions.Add(new ExecAction("shutdown", SHUTDOWN_COMMAND, null));
+
+                    // Reset the status in case it was set as anything but "Ready"
+                    task.Definition.Settings.Enabled = true;
+                    task.RegisterChanges();
+
+                    Properties.Settings.Default.ShutdownTimer = _shutdownTime;
+                    Properties.Settings.Default.Save();
+
+                    StartLocalTimer();
+                }
+
+                else
+                    throw new NoTimerExists("The timer doesn't exist in the task scheduler. You must create it instead of attempting to modify it!");
+            }
+        }
+
+        /// <summary>
+        /// Stops the scheduled task by removing the trigger.
+        /// </summary>
+        private void StopShutdownTimer()
+        {
+            using (TaskService ts = new TaskService())
+            {
+                // If the task exists, remove the trigger. Note: the Stop() method doesn't work for some reason.
+                if (TimerExists(DEFAULT_TASK_NAME))
+                {
+                    Task task = ts.GetTask(DEFAULT_TASK_NAME);
+                    task.Definition.Triggers.RemoveAt(0);
+                    task.RegisterChanges();
+                    StopLocalTimer();
+                }
+
+                else
+                    throw new NoTimerExists("The timer doesn't exist in the task scheduler. You must create it instead of attempting to modify it!");
+            }
+        }
+
+        /// <summary>
+        /// Starts the local timers and sets all the necessary options.
+        /// </summary>
+        /// <remarks>It will enable the stop and modify timer buttons as well as enable the timers. It also disables the start timer button in the menu.</remarks>
+        private void StartLocalTimer()
+        {
             EnableStopTimerButtons();
             EnableModifyTimerButtons();
+            createTimerToolStripMenuItem.Enabled = false;
 
-            SetCurrentTime();
-            SetShutdownTime(numSeconds);     // Passing only seconds in for a more exact estimate.
-
-            string cmd = "/C shutdown -s -c \"Shutting down Windows via the Windows Shutdown Timer \" -t " + numSeconds;
-
-            var process = new Process();
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = cmd;
-            process.Start();
-            process.WaitForExit();
-
-            if (process.ExitCode == 1190)
-            {
-                DialogResult result = MessageBox.Show("A windows shutdown is already pending. This must be stopped before a new one may be " +
-                    "added. Would you like to stop the other timer and add the new one?", "WARNING", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                // Don't reset the timer parameters so that the new timer may still be added.
-                if (result == DialogResult.Yes)
-                {
-                    StopShutdownTimer(false);
-                    StartShutdownTimer(numSeconds);
-                }
-                else
-                    return;
-            }
-
-            else if (process.ExitCode != 0)
-                throw new StartTimerException("Could not execute the start shutdown command through the command prompt. Windows Shutdown Error " +
-                    "Code: " + process.ExitCode, process.ExitCode.ToString());
-
-            else
-            {
-                createTimerToolStripMenuItem.Enabled = false;
-                time_remaining_timer_Tick(null, null);
-
-                // Save the latest shutdown time.
-                Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-                Properties.Settings.Default.Save();
-            }
+            time_remaining_timer.Enabled = true;
+            verify_time_remaining_timer.Enabled = true;
         }
 
         /// <summary>
-        /// Stops the shutdown timer by removing the old timer.
+        /// Stops the local timer and resets all the necessary options.
         /// </summary>
-        /// <param name="reset">Determines if the timer parameters need to be reset.</param>
-        private void StopShutdownTimer(bool reset)
+        /// <remarks>It will reset the local shutdown time and current time. It will also disable the modify and stop timer buttons as well as disable the local timers.</remarks>
+        private void StopLocalTimer(bool disabled = false)
         {
-            string cmd = "/C shutdown /a";
-            var process = Process.Start("CMD.exe", cmd);
-            process.WaitForExit();
+            ResetTimers();
 
-            // Exit Code 1190: A shutdown event is currently in progress. We ignore this event and force the stoppage.
-            // Exit Code 1116: No shutdown event currently exists. Great, don't care.
-            if (process.ExitCode != 0 && process.ExitCode != 1190 && process.ExitCode != 1116)
-                throw new StopTimerException("Could not execute the stop shutdown command through the command prompt. Error Code: " + process.ExitCode, process.ExitCode.ToString());
+            DisableModifyTimerButtons();
+            DisableStopTimerButtons();
 
+            createTimerToolStripMenuItem.Enabled = true;
+
+            time_remaining_timer.Enabled = false;
+            if(disabled)
+                time_remaining_label.Text = "Timer was disabled. Create a \nnew timer to enable it!";
             else
-            {
-                Properties.Settings.Default.ShutdownTimer = SetDefaultDateTime(Properties.Settings.Default.ShutdownTimer);
-
-                if (reset)
-                {
-                    createTimerToolStripMenuItem.Enabled = true;
-
-                    // Reset values.
-                    ResetTimers();
-
-                    // Reset the remaining time label.
-                    time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
-
-                    // Disable the timer.
-                    time_remaining_timer.Enabled = false;
-                    DisableModifyTimerButtons();
-
-                    // Disable the stop timer button again.
-                    DisableStopTimerButtons();
-                }
-            }
+                time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
         }
 
-        /// <summary>
-        /// This should always be called prior to making a call to StopShutdownTimer since that method assumes a complete stoppage. 
-        /// </summary>
-        /// <returns>Returns whether or not a shutdown timer has been initiated by any program.</returns>
-        private bool ShutdownTimerExists(int numSeconds = 50000, bool stopOtherTimer = false)
-        {
-            SetCurrentTime();
-
-            // Create a temporary shutdown command to see if it succeedes and then immediately stop it if it was created.
-            string cmd = "/C shutdown -s  -c \"Attempting to check if a timer already exists via the Windows Shutdown Timer. \" -t " + numSeconds + " && shutdown /a";
-            var process = Process.Start("CMD.exe", cmd);
-            process.WaitForExit();
-
-            if (process.ExitCode == 1190)
-                return true;
-            else if (process.ExitCode == 1116 || process.ExitCode == 0)
-                return false;
-            else
-                throw new CheckTimerException("Attempted to check to determine if a shutdown timer already exists but something went wrong! Error " +
-                    "Code: " + process.ExitCode, process.ExitCode.ToString());
-        }
         #endregion
 
         #region Event Handlers
@@ -354,21 +537,36 @@ namespace WindowsShutdownTimer
                     DialogResult confirm = MessageBox.Show("You entered 0 minutes, this means the computer will shutdown IMMEDIATELY. " +
                         "Are you sure?", "Warning - Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
-                    if (confirm == DialogResult.No)
-                        return;
+                    if (confirm == DialogResult.Yes)
+                    {
+                        UpdateCurrentTime();
+                        SetShutdownTime(1);
+                        Properties.Settings.Default.ShutdownTimer = DateTime.UtcNow;
+                        try
+                        {
+                            CreateShutdownTimer(1);
+                            return;
+                        }
+                        catch (TimerExists)
+                        {
+                            ModifyShutdownTimer(1);
+                            return;
+                        }
+                    }
                     else
-                        StartShutdownTimer(3);      // Added 3 seconds so it has enough time to save the data for the shutdown.
+                        return;
                 }
 
                 int timeInSeconds = numMinutes * 60;
+                bool timerExists = TimerExists(DEFAULT_TASK_NAME);
 
-                SetCurrentTime();
+                UpdateCurrentTime();
                 SetShutdownTime(timeInSeconds);
 
                 try
                 {
-                    // There is an existing Shutdown and the user has entered a new shutdown time.
-                    if (ShutdownTimerExists() && numMinutes != 0)
+                    // There is an existing Shutdown and it is running and the user has entered a new shutdown time.
+                    if (timerExists && TimerRunning(DEFAULT_TASK_NAME, _currentTime) && numMinutes != 0)
                     {
                         /// TODO: Add my own custom dialog box to customize the options so they aren't confusing.
                         DialogResult result = MessageBox.Show("A timer to shutdown Windows already exists. Would you like to stop that timer and add yours for "
@@ -377,17 +575,11 @@ namespace WindowsShutdownTimer
 
                         // Remove old timer and add the new one.
                         if (result == DialogResult.Yes)
-                        {
-                            StopShutdownTimer(false);
-                            StartShutdownTimer(timeInSeconds);
-                        }
+                            ModifyShutdownTimer(timeInSeconds);
 
                         // Remove old timer only.
                         else if (result == DialogResult.No)
-                        {
-                            StopShutdownTimer(true);
-                            ResetTimers();
-                        }
+                            StopShutdownTimer();
 
                         // Take no action.
                         else
@@ -399,17 +591,28 @@ namespace WindowsShutdownTimer
                         DialogResult confirm = MessageBox.Show("Are you sure you want to shutdown Windows in " + numMinutes + " minutes?", "Confirm Timer", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk);
 
                         if (confirm == DialogResult.Yes)
-                            StartShutdownTimer(timeInSeconds);
+                        {
+                            if(timerExists)
+                                ModifyShutdownTimer(timeInSeconds);
+                            else
+                                CreateShutdownTimer(timeInSeconds);
+                        }
                         else
                             return;
                     }
                 }
 
-                catch(CheckTimerException ex)
+                catch(NoTimerExists)
+                {
+                    MessageBox.Show("The old timer doesn't exist anymore. It may have been deleted by other means. This " +
+                        "shouldn't be a problem though.", "Old timer removed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                catch(Exception)
                 {
                     DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
                         "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
-                        "select YES. Error Code: " + ex.ErrorCode, "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
+                        "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
 
                     if (report == DialogResult.Yes)
                         Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
@@ -448,17 +651,50 @@ namespace WindowsShutdownTimer
         {
             try
             {
-                time_remaining_label.Text = TimeRemaining().ToString("dd' days 'hh' hr 'mm' min 'ss' sec'");
+                if (TimerExists(DEFAULT_TASK_NAME) && TimerRunning(DEFAULT_TASK_NAME, _currentTime))
+                    time_remaining_label.Text = TimeRemaining().ToString("dd' days 'hh' hr 'mm' min 'ss' sec'");
+                else
+                    throw new TimerEnded("The timer has either been stopped and is no longer running in the scheduler or it has been removed from the scheduler completely.");
+            }
+            catch(NoTimerExists)
+            {
+                if (TimerExists(DEFAULT_TASK_NAME) && TimerDisabled(DEFAULT_TASK_NAME))
+                    StopLocalTimer(true);
+                else
+                    StopLocalTimer();
             }
             catch(TimerEnded)
             {
-                time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
-                time_remaining_timer.Enabled = false;
+                if (TimerExists(DEFAULT_TASK_NAME) && TimerDisabled(DEFAULT_TASK_NAME))
+                    StopLocalTimer(true);
+                else
+                    StopLocalTimer();
             }
             catch(FormatException)
             {
                 time_remaining_label.Text = "Formatting Error. Please Restart the app.";
             }
+        }
+
+        /// <summary>
+        /// Polls the task scheduler and updates the local time shutdown timer in the event the task has been changed manually. If the 
+        /// scheduled event has been stopped, it will reset all local parameters.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void verify_time_remaining_timer_Tick(object sender, EventArgs e)
+        {
+            if (TimerExists(DEFAULT_TASK_NAME) && !TimerDisabled(DEFAULT_TASK_NAME))
+            {
+                using (TaskService ts = new TaskService())
+                {
+                    Task task = ts.GetTask(DEFAULT_TASK_NAME);
+                    if (task.NextRunTime != _shutdownTime)
+                        _shutdownTime = task.NextRunTime;
+                }
+            }
+            else
+                StopLocalTimer(true);
         }
 
         /// <summary>
@@ -474,18 +710,13 @@ namespace WindowsShutdownTimer
             {
                 try
                 {
-                    StopShutdownTimer(true);
+                    StopShutdownTimer();
                 }
 
-                catch (StopTimerException ex)
+                catch (NoTimerExists)
                 {
-                    MessageBox.Show("Could not stop the shutdown timer for some reason. Adding an additional 5 minutes to the timer. Please run 'shutdown /a' in " +
-                        "the command prompt to stop the timer. Error Code: " + ex.ErrorCode, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    // Add an additional 5 minutes to the timer to diagnose the issue.
-                    _shutdownTime.AddMinutes(5);
-                    Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-                    Properties.Settings.Default.Save();
+                    MessageBox.Show("The old timer doesn't exist anymore. It may have been deleted by other means. This " +
+                        "shouldn't be a problem though.", "Old timer removed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
@@ -497,9 +728,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_2_hr_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime = _shutdownTime.AddHours(2);
-            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-            Properties.Settings.Default.Save();
+            AddTime(7200);
         }
 
         /// <summary>
@@ -509,9 +738,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_1_hr_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime = _shutdownTime.AddHours(1);
-            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-            Properties.Settings.Default.Save();
+            AddTime(3600);
         }
 
         /// <summary>
@@ -521,9 +748,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_30_min_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime = _shutdownTime.AddMinutes(30);
-            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-            Properties.Settings.Default.Save();
+            AddTime(1800);
         }
 
         /// <summary>
@@ -533,9 +758,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_10_min_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime = _shutdownTime.AddMinutes(10);
-            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-            Properties.Settings.Default.Save();
+            AddTime(600);
         }
 
         /// <summary>
@@ -545,9 +768,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void add_5_min_menu_item_Click(object sender, EventArgs e)
         {
-            _shutdownTime = _shutdownTime.AddMinutes(5);
-            Properties.Settings.Default.ShutdownTimer = _shutdownTime;
-            Properties.Settings.Default.Save();
+            AddTime(300);
         }
 
         /// <summary>
@@ -557,11 +778,17 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void stopTimerToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            // This needs investigated.
-            if (_shutdownTime == SetDefaultDateTime(_shutdownTime))
-                StopShutdownTimer(false);
-            else
-                StopShutdownTimer(true);
+            try
+            {
+                if (_shutdownTime == SetDefaultDateTime(_shutdownTime))
+                    StopShutdownTimer();
+                else
+                    StopShutdownTimer();
+            }
+            catch(NoTimerExists)
+            {
+                StopLocalTimer();
+            }
         }
 
         /// <summary>
@@ -571,14 +798,9 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void shutdownNowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult confirm = MessageBox.Show("Are you sure you want to shutdown now?", "WARNING", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-
-            if (confirm == DialogResult.OK)
-            {
-                string cmd = "/C shutdown /s -c \" Shutting down Windows now via the Windows Shutdown Timer. \" /t 10";
-                var process = Process.Start("CMD.exe", cmd);
-                process.WaitForExit();
-            }
+            MinutesTextBox.Text = "0";      // Required for the addTimer_Button method to handle the zero.
+            addTimer_Button(null, null);
+            MinutesTextBox.Text = "";       // Reset the textbox in the event they selected to not shutdown.
         }
 
         /// <summary>
@@ -588,25 +810,17 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void TimerForm_Resize(object sender, EventArgs e)
         {
-            if (WindowState == FormWindowState.Minimized)
+            if (Properties.Settings.Default.MinimizeToSysTray)
             {
-                ApplyUserSettings();
+                notifyIcon.Visible = true;
 
-                if (Properties.Settings.Default.MinimizeToSysTray)
-                {
-                    this.ShowInTaskbar = false;
+                // If Windows 7, set the form to invisible so it won't show above the taskbar after a minimization.
+                if (this.WindowState == FormWindowState.Minimized && Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
                     this.Visible = false;
-                    // If this is windows 7, there is a small problem of it not fully minimizing the first time.
-                    // Need to simply hide the window as well or it will show a small version right above the taskbar.
-                    if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
-                        this.Visible = false;
-                }
-                else
-                    this.ShowInTaskbar = true;
             }
-
+                
             else
-                this.Visible = true;
+                notifyIcon.Visible = false;
         }
 
         /// <summary>
@@ -616,8 +830,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void notifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
-            this.Visible = true;
+            RestoreForm();
+            TimerForm_Resize(null, null);
         }
 
         /// <summary>
@@ -627,8 +841,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void createTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
-            this.Visible = true;
+            RestoreForm();
+            TimerForm_Resize(null, null);
         }
 
         /// <summary>
@@ -638,8 +852,8 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void showTimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
-            this.Visible = true;
+            RestoreForm();
+            TimerForm_Resize(null, null);
         }
 
         /// <summary>
@@ -653,8 +867,8 @@ namespace WindowsShutdownTimer
             // Only re-show the app if the user has selected it and they are left clicking (not right clicking).
             if (Properties.Settings.Default.LClickOpenSysTray && e.Button == MouseButtons.Left)
             {
-                WindowState = FormWindowState.Normal;
-                this.Visible = true;
+                RestoreForm();
+                TimerForm_Resize(null, null);
             }
         }
 
@@ -708,6 +922,19 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Called after any form closing event. Save the user's settings in the event they have been deleted.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // In case the settings are deleted before the program exits, save the user's settings prior to exiting.
+            // Adds a bit of overhead but I think it is worth it.
+            Properties.Settings.Default.Save();
+            notifyIcon.Dispose();
+        }
+
+        /// <summary>
         /// Exits the program.
         /// </summary>
         /// <param name="sender"></param>
@@ -725,18 +952,6 @@ namespace WindowsShutdownTimer
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        /// <summary>
-        /// Called after any form closing event. Save the user's settings in the event they have been deleted.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TimerForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            // In case the settings are deleted before the program exits, save the user's settings prior to exiting.
-            // Adds a bit of overhead but I think it is worth it.
-            Properties.Settings.Default.Save();
         }
 
         #endregion

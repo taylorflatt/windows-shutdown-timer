@@ -24,19 +24,29 @@ namespace WindowsShutdownTimer
             // Setting this in the design menu doesn't work. Must be set here.
             this.CenterToParent();
 
-            last_shutdown_label_desc.Text = "Last Shutdown: ";
+            last_shutdown_label_desc.Text = "Last Attempted Shutdown: ";
 
-            // Because the settings manager won't store a 0001 default DateTime year.
-            DateTime defaultDate = new DateTime(0002, 1, 1, 0, 0, 0, 0);
-                
-            // Check on the status of the previous shutdown. If it was ever set or cancelled. 
-            // Or if it is still in the future (pending). Or successful then display when.
-            if (Properties.Settings.Default.ShutdownTimer == defaultDate)
-                last_shutdown_label.Text = "N/A or Unsuccessful";
-            else if(Properties.Settings.Default.ShutdownTimer > DateTime.UtcNow.ToLocalTime())
-                last_shutdown_label.Text = "Pending " + "(" + Convert.ToString(Properties.Settings.Default.ShutdownTimer.ToLocalTime()) + ")";
+            if(timerWindow.TimerExists(TimerForm.DEFAULT_TASK_NAME))
+            {
+                if(timerWindow.TimerRunning(TimerForm.DEFAULT_TASK_NAME, DateTime.Now))
+                    last_shutdown_label.Text = "Pending " + "(" + Convert.ToString(Properties.Settings.Default.ShutdownTimer) + ")";
+                else
+                {
+                    // If the timer was never run, display the time accordingly.
+                    if (timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME) == timerWindow.SetDefaultDateTime(new DateTime()))
+                        last_shutdown_label.Text = "N/A";
+                    else
+                    {
+                        // Windows 7 doesn't have the last run time so I need to do something else.
+                        if (timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME) == default(DateTime))
+                            last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer);
+                        else
+                            last_shutdown_label.Text = Convert.ToString(timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME));
+                    }
+                }
+            }
             else
-                last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer.ToLocalTime());
+                last_shutdown_label.Text = "N/A";
         }
 
         /// <summary>
@@ -77,7 +87,7 @@ namespace WindowsShutdownTimer
                 Properties.Settings.Default.LClickOpenSysTray = false;
 
             Properties.Settings.Default.Save();
-            timerWindow.ApplyUserSettings();
+            //timerWindow.ApplyUserSettings();
 
             // Close the options form and redisplay the parent.
             ActiveForm.Close();

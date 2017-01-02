@@ -65,7 +65,7 @@
             // last_shutdown_label
             // 
             this.last_shutdown_label.AutoSize = true;
-            this.last_shutdown_label.Location = new System.Drawing.Point(96, 92);
+            this.last_shutdown_label.Location = new System.Drawing.Point(133, 92);
             this.last_shutdown_label.Name = "last_shutdown_label";
             this.last_shutdown_label.Size = new System.Drawing.Size(35, 13);
             this.last_shutdown_label.TabIndex = 2;
@@ -85,9 +85,9 @@
             this.minimize_to_sys_tray.AutoSize = true;
             this.minimize_to_sys_tray.Location = new System.Drawing.Point(7, 20);
             this.minimize_to_sys_tray.Name = "minimize_to_sys_tray";
-            this.minimize_to_sys_tray.Size = new System.Drawing.Size(133, 17);
+            this.minimize_to_sys_tray.Size = new System.Drawing.Size(263, 17);
             this.minimize_to_sys_tray.TabIndex = 0;
-            this.minimize_to_sys_tray.Text = "Minimize to system tray";
+            this.minimize_to_sys_tray.Text = "Minimize to system tray (Requires Program Restart)";
             this.minimize_to_sys_tray.UseVisualStyleBackColor = true;
             // 
             // save_options_button
