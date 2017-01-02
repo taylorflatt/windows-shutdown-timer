@@ -38,8 +38,8 @@ namespace WindowsShutdownTimer
                     else
                     {
                         // Windows 7 doesn't have the last run time so I need to do something else.
-                        if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
-                            last_shutdown_label.Text = "N/A";
+                        if (timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME) == default(DateTime))
+                            last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer);
                         else
                             last_shutdown_label.Text = Convert.ToString(timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME));
                     }
