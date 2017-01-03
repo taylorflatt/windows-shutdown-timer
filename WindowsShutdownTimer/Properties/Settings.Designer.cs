@@ -70,5 +70,17 @@ namespace WindowsShutdownTimer.Properties {
                 this["ShutdownTimer"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowShutdownNotification {
+            get {
+                return ((bool)(this["ShowShutdownNotification"]));
+            }
+            set {
+                this["ShowShutdownNotification"] = value;
+            }
+        }
     }
 }

@@ -14,5 +14,8 @@
     <Setting Name="ShutdownTimer" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)">0002-01-01</Value>
     </Setting>
+    <Setting Name="ShowShutdownNotification" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
