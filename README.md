@@ -3,7 +3,7 @@ A basic portable Windows shutdown timer. I use this personally but it is availab
 
 ## Function
 
-Creates timer that will shutdown windows after a specified number of minutes. It is non-intrusive meaning once you set the timer, you can hide it or close it without any problems. At its core, it runs a shutdown command through the windows command prompt with a timer attached.
+Creates timer that will shutdown windows after a specified number of minutes. It is non-intrusive meaning once you set the timer, you can hide it or close it without any problems. At its core, it runs a scheduled task whose actions is a shutdown command through the windows command prompt.
 
 ## Requirements
 
