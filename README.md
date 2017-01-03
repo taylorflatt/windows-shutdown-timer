@@ -26,7 +26,7 @@ Download the [latest release](https://github.com/taylorflatt/windows-shutdown-ti
 
 ## Updating
 
-To update, simply choose the "Update" option in the program and it will determine if there is a newer version available. If there is, you have the option to download it. The newer version will be downloaded and placed in the same place as the older version. Once downloaded, it is then safe to remove the old version. Note, your settings will not be preserved (next release).
+To update, simply choose the "Update" option in the program and it will determine if there is a newer version available. If there is, you have the option to download it. The newer version will be downloaded and placed in the same place as the older version. Once downloaded, it is then safe to remove the old version.
 
 Otherwise, you can simply download the latest version from the [Release Section](https://github.com/taylorflatt/windows-shutdown-timer/releases).
 
