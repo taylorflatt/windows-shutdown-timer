@@ -36,11 +36,13 @@
             this.minimize_to_sys_tray = new System.Windows.Forms.CheckBox();
             this.save_options_button = new System.Windows.Forms.Button();
             this.check_update_button = new System.Windows.Forms.Button();
+            this.show_shutdown_notification = new System.Windows.Forms.CheckBox();
             this.options_group_box.SuspendLayout();
             this.SuspendLayout();
             // 
             // options_group_box
             // 
+            this.options_group_box.Controls.Add(this.show_shutdown_notification);
             this.options_group_box.Controls.Add(this.left_click_open_sys_tray);
             this.options_group_box.Controls.Add(this.last_shutdown_label);
             this.options_group_box.Controls.Add(this.last_shutdown_label_desc);
@@ -110,6 +112,16 @@
             this.check_update_button.UseVisualStyleBackColor = true;
             this.check_update_button.Click += new System.EventHandler(this.check_update_button_Click);
             // 
+            // show_shutdown_notification
+            // 
+            this.show_shutdown_notification.AutoSize = true;
+            this.show_shutdown_notification.Location = new System.Drawing.Point(7, 68);
+            this.show_shutdown_notification.Name = "show_shutdown_notification";
+            this.show_shutdown_notification.Size = new System.Drawing.Size(297, 17);
+            this.show_shutdown_notification.TabIndex = 4;
+            this.show_shutdown_notification.Text = "Display Shutdown Notification (Requires Program Restart)";
+            this.show_shutdown_notification.UseVisualStyleBackColor = true;
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -140,5 +152,6 @@
         private System.Windows.Forms.Label last_shutdown_label;
         private System.Windows.Forms.CheckBox left_click_open_sys_tray;
         private System.Windows.Forms.Button check_update_button;
+        private System.Windows.Forms.CheckBox show_shutdown_notification;
     }
 }

@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32.TaskScheduler;
+using System;
 using System.Windows.Forms;
 
 namespace WindowsShutdownTimer
 {
     public partial class Options : Form
     {
+        #region Main
+
         /// <summary>
         /// The parent form object.
         /// </summary>
@@ -26,28 +29,72 @@ namespace WindowsShutdownTimer
 
             last_shutdown_label_desc.Text = "Last Attempted Shutdown: ";
 
-            if(timerWindow.TimerExists(TimerForm.DEFAULT_TASK_NAME))
+            if (timerWindow.TimerExists(TimerForm.DEFAULT_TASK_NAME))
             {
-                if(timerWindow.TimerRunning(TimerForm.DEFAULT_TASK_NAME, DateTime.Now))
+                if (timerWindow.TimerRunning(TimerForm.DEFAULT_TASK_NAME, DateTime.Now))
                     last_shutdown_label.Text = "Pending " + "(" + Convert.ToString(Properties.Settings.Default.ShutdownTimer) + ")";
                 else
                 {
-                    // If the timer was never run, display the time accordingly.
-                    if (timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME) == timerWindow.SetDefaultDateTime(new DateTime()))
-                        last_shutdown_label.Text = "N/A";
-                    else
+                    try
                     {
-                        // Windows 7 doesn't have the last run time so I need to do something else.
-                        if (timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME) == default(DateTime))
-                            last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer);
+                        // If the timer was never run, display the time accordingly.
+                        if (GetLastRunTime(TimerForm.DEFAULT_TASK_NAME) == timerWindow.SetDefaultDateTime(new DateTime()))
+                            last_shutdown_label.Text = "N/A";
                         else
-                            last_shutdown_label.Text = Convert.ToString(timerWindow.GetLastRunTime(TimerForm.DEFAULT_TASK_NAME));
+                        {
+                            // Windows 7 doesn't have the last run time so I need to do something else.
+                            if (GetLastRunTime(TimerForm.DEFAULT_TASK_NAME) == default(DateTime))
+                                last_shutdown_label.Text = Convert.ToString(Properties.Settings.Default.ShutdownTimer);
+                            else
+                                last_shutdown_label.Text = Convert.ToString(GetLastRunTime(TimerForm.DEFAULT_TASK_NAME));
+                        }
+                    }
+                    catch(NoTimerExists)
+                    {
+                        last_shutdown_label.Text = "N/A";
                     }
                 }
             }
             else
                 last_shutdown_label.Text = "N/A";
+
+            timerWindow.BringFormForward();
         }
+
+        #endregion
+
+        #region Helper Functions
+
+        /// <summary>
+        /// Gets the last time a scheduled task was run (successfully or not).
+        /// </summary>
+        /// <param name="taskName">The name of the task that will be searched.</param>
+        /// <returns>Returns the DateTime of when the scheduled even last fired.</returns>
+        public DateTime GetLastRunTime(string taskName)
+        {
+            if(Properties.Settings.Default.ShowShutdownNotification)
+                return Properties.Settings.Default.ShutdownTimer;
+
+            else
+            {
+                using (TaskService ts = new TaskService())
+                {
+                    // If the task exists, return the last run time.
+                    if (timerWindow.TimerExists(taskName))
+                    {
+                        Task task = ts.GetTask(taskName);
+                        return task.LastRunTime;
+                    }
+
+                    else
+                        throw new NoTimerExists("The timer doesn't exist in the task scheduler.");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Event Handlers
 
         /// <summary>
         /// When the form loads, set the check boxes according to the user's prior settings (if any).
@@ -56,15 +103,23 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void Options_Load(object sender, EventArgs e)
         {
+            // First check box
             if (Properties.Settings.Default.MinimizeToSysTray)
                 minimize_to_sys_tray.Checked = true;
             else
                 minimize_to_sys_tray.Checked = false;
 
+            // Second check box
             if (Properties.Settings.Default.LClickOpenSysTray)
                 left_click_open_sys_tray.Checked = true;
             else
                 left_click_open_sys_tray.Checked = false;
+
+            // Third check box
+            if (Properties.Settings.Default.ShowShutdownNotification)
+                show_shutdown_notification.Checked = true;
+            else
+                show_shutdown_notification.Checked = false;
         }
 
         /// <summary>
@@ -73,26 +128,44 @@ namespace WindowsShutdownTimer
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void save_options_button_Click(object sender, EventArgs e)
-        { 
+        {
             // Minimize program to system tray rather than to the taskbar.
             if (minimize_to_sys_tray.Checked)
                 Properties.Settings.Default.MinimizeToSysTray = true;
             else
                 Properties.Settings.Default.MinimizeToSysTray = false;
-            
+
             // Single left click to re-show program when clicking icon in system tray.
             if (left_click_open_sys_tray.Checked)
                 Properties.Settings.Default.LClickOpenSysTray = true;
             else
                 Properties.Settings.Default.LClickOpenSysTray = false;
 
+            // Display the shutdown notification from windows alerting the user of an impending shutdown.
+            if (show_shutdown_notification.Checked && !Properties.Settings.Default.ShowShutdownNotification)
+            {
+                DialogResult confirm = MessageBox.Show("Are you sure you want to show the shutdown notifications? This may result in the " +
+                    "timer being inaccurate and you not being shown the correct time remaining. In addition, it also has to create/remove a " +
+                    "shutdown timer each time you load the program in order to check if one exists. So that might result in a message indicating " +
+                    "that a shutdown was stopped but it was only a check. I honestly don't recommend enabling this option. Proceed with caution!"
+                    , "WARNING - Are you sure?" , MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                if (confirm == DialogResult.Yes)
+                    Properties.Settings.Default.ShowShutdownNotification = true;
+                else
+                    return;
+            }
+            else
+                Properties.Settings.Default.ShowShutdownNotification = false;
+
             Properties.Settings.Default.Save();
-            //timerWindow.ApplyUserSettings();
 
             // Close the options form and redisplay the parent.
             ActiveForm.Close();
             timerWindow.Enabled = true;
             timerWindow.Visible = true;
+
+            timerWindow.BringFormForward();
         }
 
         /// <summary>
@@ -103,6 +176,7 @@ namespace WindowsShutdownTimer
         private void Options_FormClosing(object sender, FormClosingEventArgs e)
         {
             timerWindow.Enabled = true;
+            timerWindow.BringFormForward();
         }
 
         /// <summary>
@@ -123,9 +197,9 @@ namespace WindowsShutdownTimer
             Array curV = currentVersion.Split('.');
 
             // Note: The user's version number should never be higher than the release version. So I don't even consider that case.
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
-                if(Convert.ToInt32(webV.GetValue(i)) > Convert.ToInt32(curV.GetValue(i)))
+                if (Convert.ToInt32(webV.GetValue(i)) > Convert.ToInt32(curV.GetValue(i)))
                 {
                     DialogResult result = MessageBox.Show("The current version is: " + currentVersion + " and the newest version is " + webVersion + ". Would you " +
                         "like to download the newest version?", "New Version Found!", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -168,5 +242,7 @@ namespace WindowsShutdownTimer
 
             MessageBox.Show("The current version is: " + currentVersion + " and it is up to date!", "No New Update!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        #endregion
     }
 }
