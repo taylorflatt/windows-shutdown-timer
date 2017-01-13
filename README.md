@@ -1,4 +1,4 @@
-# Portable Windows Shutdown Timer
+# [Portable Windows Shutdown Timer](https://github.com/taylorflatt/windows-shutdown-timer/releases/tag/2.1.0.0)
 A basic portable Windows shutdown timer. I use this personally but it is available for anyone to use. 
 
 ## Function
