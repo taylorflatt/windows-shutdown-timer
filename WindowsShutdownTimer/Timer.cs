@@ -424,6 +424,9 @@ namespace WindowsShutdownTimer
         /// that timer. Otherwise, remove it and call this method again.</exception>
         private void CreateShutdownTimer(int numSeconds)
         {
+            if (numSeconds <= 0)
+                throw new ArgumentOutOfRangeException(numSeconds.ToString(), "The input must be an integer larger than 0.");
+
             using (TaskService ts = new TaskService())
             {
                 // If the task doesn't exist, create it.
