@@ -147,7 +147,7 @@ namespace WindowsShutdownTimer
                 DialogResult confirm = MessageBox.Show("Are you sure you want to show the shutdown notifications? This may result in the " +
                     "timer being inaccurate and you not being shown the correct time remaining. In addition, it also has to create/remove a " +
                     "shutdown timer each time you load the program in order to check if one exists. So that might result in a message indicating " +
-                    "that a shutdown was stopped but it was only a check. I honestly don't recommend enabling this option. Proceed with caution!"
+                    "that a shutdown was stopped but it was only a check. I don't recommend enabling this option. Proceed with caution!"
                     , "WARNING - Are you sure?" , MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
 
                 if (confirm == DialogResult.Yes)

@@ -64,6 +64,7 @@
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.verify_time_remaining_timer = new System.Windows.Forms.Timer(this.components);
             this.docsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpProvider1 = new System.Windows.Forms.HelpProvider();
             this.groupBox1.SuspendLayout();
             this.main_menu.SuspendLayout();
             this.contextMenuStrip.SuspendLayout();
@@ -261,21 +262,21 @@
             // updateToolStripMenuItem
             // 
             this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
-            this.updateToolStripMenuItem.Size = new System.Drawing.Size(185, 30);
+            this.updateToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
             this.updateToolStripMenuItem.Text = "Update";
             this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
             // 
             // bugReportToolStripMenuItem
             // 
             this.bugReportToolStripMenuItem.Name = "bugReportToolStripMenuItem";
-            this.bugReportToolStripMenuItem.Size = new System.Drawing.Size(185, 30);
+            this.bugReportToolStripMenuItem.Size = new System.Drawing.Size(210, 30);
             this.bugReportToolStripMenuItem.Text = "Bug Report";
             this.bugReportToolStripMenuItem.Click += new System.EventHandler(this.bugReportToolStripMenuItem_Click);
             // 
             // optionsToolStripMenuItem1
             // 
             this.optionsToolStripMenuItem1.Name = "optionsToolStripMenuItem1";
-            this.optionsToolStripMenuItem1.Size = new System.Drawing.Size(185, 30);
+            this.optionsToolStripMenuItem1.Size = new System.Drawing.Size(210, 30);
             this.optionsToolStripMenuItem1.Text = "About";
             this.optionsToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -364,6 +365,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.main_menu);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.main_menu;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -419,6 +421,7 @@
         private System.Windows.Forms.ToolStripMenuItem bugReportToolStripMenuItem;
         private System.Windows.Forms.Timer verify_time_remaining_timer;
         private System.Windows.Forms.ToolStripMenuItem docsToolStripMenuItem;
+        private System.Windows.Forms.HelpProvider helpProvider1;
     }
 }
 

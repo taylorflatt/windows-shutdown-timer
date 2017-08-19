@@ -120,6 +120,21 @@ namespace WindowsShutdownTimer
         }
 
         /// <summary>
+        /// Displays a generic error message and provides a link in order to report the bug.
+        /// </summary>
+        private void DisplayGenericError()
+        {
+            DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
+                "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
+                "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
+
+            if (report == DialogResult.Yes)
+                Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
+            else
+                return;
+        }
+
+        /// <summary>
         /// Enables the add time buttons in the menu and system tray menu.
         /// </summary>
         private void EnableModifyTimerButtons()
@@ -694,18 +709,6 @@ namespace WindowsShutdownTimer
             }
 
             BringFormForward();
-        }
-
-        private void DisplayGenericError()
-        {
-            DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
-                "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
-                "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
-
-            if (report == DialogResult.Yes)
-                Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
-            else
-                return;
         }
 
         /// <summary>
