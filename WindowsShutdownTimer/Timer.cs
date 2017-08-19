@@ -237,6 +237,9 @@ namespace WindowsShutdownTimer
         /// <param name="numSeconds">The number of seconds from the method call that the computer will be set to shutdown.</param>
         private void AddTime(int numSeconds)
         {
+            if(numSeconds <= 0)
+                throw new ArgumentOutOfRangeException(numSeconds.ToString(), "The input must be an integer larger than 0.");
+
             _shutdownTime = _shutdownTime.AddSeconds(numSeconds);
             Properties.Settings.Default.ShutdownTimer = _shutdownTime;
             Properties.Settings.Default.Save();
