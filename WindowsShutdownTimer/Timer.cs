@@ -27,7 +27,7 @@ namespace WindowsShutdownTimer
         {
             bool programRunning = (Application.OpenForms.OfType<TimerForm>().Count() >= 1) ? true : false;
 
-            if(!programRunning)
+            if (!programRunning)
             {
                 InitializeComponent();
 
@@ -64,30 +64,7 @@ namespace WindowsShutdownTimer
 
                 // Only run on version update or first time run.
                 if (Properties.Settings.Default.FirstRun)
-                {
-                    // Gets the user's previous settings (if any).
-                    Properties.Settings.Default.Upgrade();
-                    Properties.Settings.Default.Save();
-
-                    // If the user's FirstRun is STILL true, then this truly is the first time they have run the program.
-                    // Note: If the user puts the version in a NEW location, this will still display as a first run and not pull settings.
-                    if (Properties.Settings.Default.FirstRun)
-                    {
-                        MessageBox.Show("This appears to be the first time running the Windows Shutdown Timer! \nCreating a Timer: " +
-                            "Enter a time in the textbox and press \"Set Timer\". \nStopping a Timer: In the main menu under \"Timer\" > \"Stop Timer\".", 
-                            " Welcome to Windows Shutdown Timer!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        // Important to set the date (year specifically) to 0002 so it will actually save. Otherwise it won't save the date.
-                        Properties.Settings.Default.ShutdownTimer = SetDefaultDateTime(Properties.Settings.Default.ShutdownTimer);
-                        Properties.Settings.Default.FirstRun = false;
-                        Properties.Settings.Default.Save();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Thank you for downloading the most recent version of the Windows Shutdown Timer! You may now safely delete the old " +
-                            "version of the timer if you haven't already.", "Thank you for upgrading!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
+                    FirstRun();
 
                 // Check if there is currently a timer running.
                 if (Properties.Settings.Default.ShutdownTimer > _currentTime && !programRunning)
@@ -101,7 +78,7 @@ namespace WindowsShutdownTimer
                     {
                         StopLocalTimer();
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
                             "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
@@ -119,6 +96,35 @@ namespace WindowsShutdownTimer
         #endregion
 
         #region Helper Functions
+
+        /// <summary>
+        /// Only run on the first time executing the program. Welcomes the user and gives a brief how-to.
+        /// </summary>
+        private void FirstRun()
+        {
+            // Gets the user's previous settings (if any).
+            Properties.Settings.Default.Upgrade();
+            Properties.Settings.Default.Save();
+
+            // If the user's FirstRun is STILL true, then this truly is the first time they have run the program.
+            // Note: If the user puts the version in a NEW location, this will still display as a first run and not pull settings.
+            if (Properties.Settings.Default.FirstRun)
+            {
+                MessageBox.Show("This appears to be the first time running the Windows Shutdown Timer! \nCreating a Timer: " +
+                    "Enter a time in the textbox and press \"Set Timer\". \n\nStopping a Timer: In the main menu under \"Timer\" > \"Stop Timer\".",
+                    " Welcome to Windows Shutdown Timer!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Important to set the date (year specifically) to 0002 so it will actually save. Otherwise it won't save the date.
+                Properties.Settings.Default.ShutdownTimer = SetDefaultDateTime(Properties.Settings.Default.ShutdownTimer);
+                Properties.Settings.Default.FirstRun = false;
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                MessageBox.Show("Thank you for downloading the most recent version of the Windows Shutdown Timer! You may now safely delete the old " +
+                    "version of the timer if you haven't already.", "Thank you for upgrading!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
 
         /// <summary>
         /// Enables the add time buttons in the menu and system tray menu.
@@ -326,10 +332,10 @@ namespace WindowsShutdownTimer
         /// <returns>Returns the DateTime of when the scheduled event is set to fire.</returns>
         public DateTime GetRunningTimer(string taskName, bool onlyCheckRunning)
         {
-            if(TimerExists(taskName))
+            if (TimerExists(taskName))
             {
                 // This will likely be inaccurate but the user WAS warned about the possibility.
-                if(Properties.Settings.Default.ShowShutdownNotification)
+                if (Properties.Settings.Default.ShowShutdownNotification)
                     return Properties.Settings.Default.ShutdownTimer;
 
                 else
@@ -396,7 +402,7 @@ namespace WindowsShutdownTimer
 
                         StartLocalTimer();
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         DialogResult alert = MessageBox.Show("The timer couldn't be set. ", "Error - Couldn't Set Timer!", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
 
@@ -431,7 +437,7 @@ namespace WindowsShutdownTimer
                             task.Definition.Triggers.RemoveAt(index);
                         }
                     }
-                    
+
                     if (task.Definition.Actions.Count == 1)
                         task.Definition.Actions.RemoveAt(0);
 
@@ -476,7 +482,7 @@ namespace WindowsShutdownTimer
         private void StopShutdownTimer()
         {
             // Need to stop the timer from the command line since there isn't a task to stop.
-            if(Properties.Settings.Default.ShowShutdownNotification)
+            if (Properties.Settings.Default.ShowShutdownNotification)
             {
                 string cmd = "/C shutdown /a";
                 var process = Process.Start("CMD.exe", cmd);
@@ -534,7 +540,7 @@ namespace WindowsShutdownTimer
             createTimerToolStripMenuItem.Enabled = true;
 
             time_remaining_timer.Enabled = false;
-            if(disabled)
+            if (disabled)
                 time_remaining_label.Text = "Timer was disabled. Create a \nnew timer to enable it!";
             else
                 time_remaining_label.Text = DEFAULT_TIMER_DISPLAY;
@@ -551,7 +557,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void addTimer_Button(object sender, EventArgs e)
         {
-            if(int.TryParse(MinutesTextBox.Text, out int numMinutes))
+            if (int.TryParse(MinutesTextBox.Text, out int numMinutes))
             {
                 int timeInSeconds = numMinutes * 60;
                 bool timerExists = TimerExists(DEFAULT_TASK_NAME);
@@ -568,7 +574,7 @@ namespace WindowsShutdownTimer
                 }
 
                 // Make sure they want to actually shut down right now.
-                else if(numMinutes == 0)
+                else if (numMinutes == 0)
                 {
                     DialogResult confirm = MessageBox.Show("You entered 0 minutes, this means the computer will shutdown IMMEDIATELY. " +
                         "Are you sure?", "Warning - Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
@@ -622,7 +628,7 @@ namespace WindowsShutdownTimer
 
                         if (confirm == DialogResult.Yes)
                         {
-                            if(timerExists)
+                            if (timerExists)
                                 ModifyShutdownTimer(timeInSeconds);
                             else
                                 CreateShutdownTimer(timeInSeconds);
@@ -632,13 +638,13 @@ namespace WindowsShutdownTimer
                     }
                 }
 
-                catch(NoTimerExists)
+                catch (NoTimerExists)
                 {
                     MessageBox.Show("The old timer doesn't exist anymore. It may have been deleted by other means. This " +
                         "shouldn't be a problem though.", "Old timer removed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
 
-                catch(Exception)
+                catch (Exception)
                 {
                     DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
                         "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
@@ -654,7 +660,7 @@ namespace WindowsShutdownTimer
             else
             {
                 MessageBox.Show("There was difficulty parsing the number that you entered. Perhaps you made the number too large " +
-                    "(>5255999 minutes)? The number I see: " + numMinutes + ". Please try a different number." , "Trouble Creating Timer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    "(>5255999 minutes)? The number I see: " + numMinutes + ". Please try a different number.", "Trouble Creating Timer", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             BringFormForward();
@@ -667,7 +673,7 @@ namespace WindowsShutdownTimer
         /// <param name="e"></param>
         private void MinutesTextBox_TextChanged(object sender, EventArgs e)
         {
-            if(MinutesTextBox.Text.Any() && MinutesTextBox.Text.All(char.IsDigit))
+            if (MinutesTextBox.Text.Any() && MinutesTextBox.Text.All(char.IsDigit))
                 submit_Button.Enabled = true;
 
             else
@@ -688,21 +694,21 @@ namespace WindowsShutdownTimer
                 else
                     throw new TimerEnded("The timer has either been stopped and is no longer running in the scheduler or it has been removed from the scheduler completely.");
             }
-            catch(NoTimerExists)
+            catch (NoTimerExists)
             {
                 if (TimerExists(DEFAULT_TASK_NAME) && TimerDisabled(DEFAULT_TASK_NAME))
                     StopLocalTimer(true);
                 else
                     StopLocalTimer();
             }
-            catch(TimerEnded)
+            catch (TimerEnded)
             {
                 if (TimerExists(DEFAULT_TASK_NAME) && TimerDisabled(DEFAULT_TASK_NAME))
                     StopLocalTimer(true);
                 else
                     StopLocalTimer();
             }
-            catch(FormatException)
+            catch (FormatException)
             {
                 time_remaining_label.Text = "Formatting Error. Please Restart the app.";
             }
@@ -820,7 +826,7 @@ namespace WindowsShutdownTimer
                 else
                     StopShutdownTimer();
             }
-            catch(NoTimerExists)
+            catch (NoTimerExists)
             {
                 StopLocalTimer();
             }
@@ -853,7 +859,7 @@ namespace WindowsShutdownTimer
                 if (this.WindowState == FormWindowState.Minimized && Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
                     this.Visible = false;
             }
-                
+
             else
                 notifyIcon.Visible = false;
         }

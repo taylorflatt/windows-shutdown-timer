@@ -153,6 +153,9 @@
     <Content Include="FodyWeavers.xml" />
     <Content Include="icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="WindowsShutdownTimer.Tests\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
     <ParameterGroup>
