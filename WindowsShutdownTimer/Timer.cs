@@ -330,11 +330,26 @@ namespace WindowsShutdownTimer
             {
                 using (TaskService ts = new TaskService())
                 {
-                    Task task = ts.GetTask(taskName);
-                    if (TimerExists(taskName) && !TimerDisabled(taskName) && task.NextRunTime != null && task.NextRunTime > currentTime)
-                        return true;
-                    else
-                        return false;
+                    try
+                    {
+                        Task task = ts.GetTask(taskName);
+                        if (TimerExists(taskName) && !TimerDisabled(taskName) && task.NextRunTime != null && task.NextRunTime > currentTime)
+                            return true;
+                        else
+                            return false;
+                    }
+                    catch (AggregateException e)
+                    {
+                        e.Handle((x) =>
+                        {
+                            if (x is UnauthorizedAccessException) // This we know how to handle.
+                                MessageBox.Show("You do not have permission to create a task in the Task Scheduler.");
+
+                            return false;
+                        });
+                    }
+
+                    return false;
                 }
             }
         }
