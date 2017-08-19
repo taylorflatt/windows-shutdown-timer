@@ -479,6 +479,9 @@ namespace WindowsShutdownTimer
         /// <remarks>This should be used instead of CreateShutdownTimer when there already exists a shutdown timer.</remarks>
         private void ModifyShutdownTimer(int numSeconds)
         {
+            if (numSeconds <= 0)
+                throw new ArgumentOutOfRangeException(numSeconds.ToString(), "The input must be an integer larger than 0.");
+
             using (TaskService ts = new TaskService())
             {
                 // If the task exists, update the trigger.
