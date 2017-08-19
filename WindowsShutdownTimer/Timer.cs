@@ -80,14 +80,7 @@ namespace WindowsShutdownTimer
                     }
                     catch (Exception)
                     {
-                        DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
-                            "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
-                            "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
-
-                        if (report == DialogResult.Yes)
-                            Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
-                        else
-                            return;
+                        DisplayGenericError();
                     }
                 }
             }
@@ -550,7 +543,6 @@ namespace WindowsShutdownTimer
                         task.RegisterChanges();
                         StopLocalTimer();
                     }
-
                     else
                         throw new NoTimerExists("The timer doesn't exist in the task scheduler. You must create it instead of attempting to modify it!");
                 }
@@ -691,24 +683,29 @@ namespace WindowsShutdownTimer
 
                 catch (Exception)
                 {
-                    DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
-                        "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
-                        "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
-
-                    if (report == DialogResult.Yes)
-                        Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
-                    else
-                        return;
+                    DisplayGenericError();
                 }
             }
 
             else
             {
                 MessageBox.Show("There was difficulty parsing the number that you entered. Perhaps you made the number too large " +
-                    "(>5255999 minutes)? The number I see: " + numMinutes + ". Please try a different number.", "Trouble Creating Timer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    "(>5255999 minutes)? The number I see: " + MinutesTextBox.Text + ". Please try a different number.", "Trouble Creating Timer", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             BringFormForward();
+        }
+
+        private void DisplayGenericError()
+        {
+            DialogResult report = MessageBox.Show("Could not check if there is an existing shutdown timer or not. Please note that the 'Time Remaining' timer may be inaccurate so it " +
+                "might be safest to simply stop the timer through the menu before attempting to add a timer. If you would like to report this issue (I would really appreciate it), " +
+                "select YES.", "Submit Bug Report - Cannot Check for Existing Timer", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Error);
+
+            if (report == DialogResult.Yes)
+                Process.Start("https://github.com/taylorflatt/windows-shutdown-timer/issues");
+            else
+                return;
         }
 
         /// <summary>
